@@ -1,0 +1,290 @@
+openapi: 3.0.3
+info:
+  title: Dcard Lite
+  version: 1.0.0
+  description: Based on rp-001-register-login
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+tags:
+  - name: Auth
+    description: Register & Login
+
+paths:
+  /users/register:
+    post:
+      tags: [Auth]
+      summary: User register
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+            examples:
+              example:
+                value:
+                  name: "Leo"
+                  email: "leo@example.com"
+                  password: "abc12345"
+                  confirmPassword: "abc12345"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+              examples:
+                success:
+                  value:
+                    userId: 123
+                    displayName: "Leo"
+                    email: "leo@example.com"
+                    role: "USER"
+                    createdAt: "2025-12-25T10:00:00Z"
+        "400":
+          description: Bad Request (validation failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                nameInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "NAME_INVALID"
+                    path: "/users/register"
+                    timestamp: "2025-12-25T10:00:00Z"
+                emailInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "EMAIL_INVALID"
+                    path: "/users/register"
+                    timestamp: "2025-12-25T10:00:00Z"
+                passwordInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PASSWORD_INVALID"
+                    path: "/users/register"
+                    timestamp: "2025-12-25T10:00:00Z"
+                confirmPasswordInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "CONFIRM_PASSWORD_INVALID"
+                    path: "/users/register"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "409":
+          description: Conflict (email already exists)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                emailAlreadyExists:
+                  value:
+                    status: 409
+                    error: "Conflict"
+                    message: "CONFLICT"
+                    code: "EMAIL_ALREADY_EXISTS"
+                    path: "/users/register"
+                    timestamp: "2025-12-25T10:00:00Z"
+
+  /users/login:
+    post:
+      tags: [Auth]
+      summary: User login
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            examples:
+              example:
+                value:
+                  email: "leo@example.com"
+                  password: "abc12345"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+              examples:
+                success:
+                  value:
+                    userId: 123
+                    displayName: "Leo"
+                    role: "USER"
+                    accessToken: "..."
+        "400":
+          description: Bad Request (validation failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                emailInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "EMAIL_INVALID"
+                    path: "/users/login"
+                    timestamp: "2025-12-25T10:00:00Z"
+                passwordInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PASSWORD_INVALID"
+                    path: "/users/login"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "401":
+          description: Unauthorized (authentication failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                authenticationFailed:
+                  value:
+                    status: 401
+                    error: "Unauthorized"
+                    message: "UNAUTHORIZED"
+                    code: "AUTHENTICATION_FAILED"
+                    path: "/users/login"
+                    timestamp: "2025-12-25T10:00:00Z"
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [name, email, password, confirmPassword]
+      properties:
+        name:
+          type: string
+          description: User display name (validated after trim)
+          maxLength: 20
+          example: "Leo"
+        email:
+          type: string
+          description: Email (validated after trim, stored lowercase)
+          format: email
+          maxLength: 100
+          example: "leo@example.com"
+        password:
+          type: string
+          description: Password (8-12 chars, at least one letter and one digit; validated after trim)
+          minLength: 8
+          maxLength: 12
+          example: "abc12345"
+        confirmPassword:
+          type: string
+          description: Must match password (validated after trim)
+          minLength: 8
+          maxLength: 12
+          example: "abc12345"
+
+    RegisterResponse:
+      type: object
+      required: [userId, displayName, email, role, createdAt]
+      properties:
+        userId:
+          type: integer
+          format: int64
+          example: 123
+        displayName:
+          type: string
+          maxLength: 20
+          example: "Leo"
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: "leo@example.com"
+        role:
+          type: string
+          example: "USER"
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO-8601 UTC
+          example: "2025-12-25T10:00:00Z"
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          description: Email (validated after trim)
+          example: "leo@example.com"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 12
+          description: Password (validated after trim)
+          example: "abc12345"
+
+    LoginResponse:
+      type: object
+      required: [userId, displayName, role, accessToken]
+      properties:
+        userId:
+          type: integer
+          format: int64
+          example: 123
+        displayName:
+          type: string
+          maxLength: 20
+          example: "Leo"
+        role:
+          type: string
+          example: "USER"
+        accessToken:
+          type: string
+          description: JWT access token
+          example: "..."
+
+    ErrorResponse:
+      type: object
+      required: [status, error, message, code, path, timestamp]
+      properties:
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          description: HTTP reason phrase (framework-generated)
+          example: "Bad Request"
+        message:
+          type: string
+          description: Error category
+          example: "VALIDATION_FAILED"
+        code:
+          type: string
+          description: Error code detail
+          example: "EMAIL_INVALID"
+        path:
+          type: string
+          example: "/users/register"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-25T10:00:00Z"
