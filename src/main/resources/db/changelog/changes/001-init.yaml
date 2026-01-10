@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-init
+      author: leo
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: user_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password_hash
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: VARCHAR(10)
+                  defaultValue: USER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: DATETIME(6)
+                  defaultValueComputed: CURRENT_TIMESTAMP(6)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: users
+            columnNames: email
+            constraintName: uq_users_email
