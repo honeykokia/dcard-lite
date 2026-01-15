@@ -34,10 +34,6 @@ public class SecurityConfig {
                 .build();
     }
 
-    /**
-     * 這裡先給你一個「開發用」CORS（先能跑再收緊）
-     * 之後你再把 allowedOriginPatterns 改成你的前端 domain
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
