@@ -276,6 +276,10 @@ components:
         message:
           type: string
           description: Error category
+          enum:
+            - VALIDATION_FAILED
+            - UNAUTHORIZED
+            - CONFLICT
           example: "VALIDATION_FAILED"
         code:
           type: string
