@@ -297,7 +297,41 @@
     - `accessToken` payload 包含正確的 userId、displayName、role
     - 登入時間在 token 的有效期限內
 ### 登入失敗
-#### Email錯誤認證失敗
+#### Email格式驗證失敗
+- Given
+  - request body：
+      - email = "leoexample.com" or "   " (純空白) or "" (空字串) or thisEmailIsTooLongOverOneHundredCharacters
+      - password = "abc12345"
+- When
+  - 呼叫 `POST /users/login`
+- Then
+  - status = `400 Bad request`
+  - response body：
+      - status = 400
+      - error = "Bad Request"
+      - message = "VALIDATION_FAILED"
+      - code = "EMAIL_INVALID"
+      - path = "/users/login"
+      - timestamp = "..."
+      - 
+#### Password格式驗證失敗
+- Given
+    - request body：
+        - email =   "leo@example.com"
+        - password = "" (空字串)
+- When
+    - 呼叫 `POST /users/login`
+- Then
+    - status = `400 Bad request`
+    - response body：
+        - status = 400
+        - error = "Bad Request"
+        - message = "VALIDATION_FAILED"
+        - code = "PASSWORD_INVALID"
+        - path = "/users/login"
+        - timestamp = "..."
+
+#### Email帳號不存在
 - Given
     - request body：
         - email = "John@example.com"
