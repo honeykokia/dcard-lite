@@ -11,7 +11,7 @@ import java.time.Instant;
 public class ErrorResponse {
     private int status;
     private String error;
-    private String message;
+    private ErrorMessage message;
     private String code;
     private String path;
     private Instant timestamp;
