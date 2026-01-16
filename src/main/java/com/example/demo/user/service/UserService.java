@@ -2,6 +2,7 @@ package com.example.demo.user.service;
 
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
+import com.example.demo.common.security.JwtService;
 import com.example.demo.user.dto.LoginRequest;
 import com.example.demo.user.dto.LoginResponse;
 import com.example.demo.user.dto.RegisterUserRequest;
@@ -12,10 +13,15 @@ import com.example.demo.user.error.UserErrorCode;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -26,6 +32,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Transactional
     public RegisterUserResponse registerUser(RegisterUserRequest registerUserRequest) {
 
         String password = registerUserRequest.getPassword();
@@ -70,12 +80,22 @@ public class UserService {
             throw new ApiException(ErrorMessage.UNAUTHORIZED, UserErrorCode.AUTHENTICATION_FAILED);
         }
 
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", user.getUserId());
+        extraClaims.put("role", user.getRole().toString());
+
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getEmail(), user.getPasswordHash(), new ArrayList<>()
+        );
+
+        String token = jwtService.generateToken(extraClaims, userDetails);
+
         LoginResponse response = new LoginResponse();
         response.setUserId(user.getUserId());
         response.setDisplayName(user.getDisplayName());
         response.setRole(user.getRole());
         // 測試只要求非 null；先給一個簡單 token（之後可換成 JWT）
-        response.setAccessToken(UUID.randomUUID().toString());
+        response.setAccessToken(token);
         return response;
     }
 
