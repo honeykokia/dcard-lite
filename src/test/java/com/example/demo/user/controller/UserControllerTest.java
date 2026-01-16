@@ -1,6 +1,6 @@
 package com.example.demo.user.controller;
 
-import com.example.demo.common.config.SecurityConfig;
+import com.example.demo.common.security.SecurityConfig;
 import com.example.demo.common.exception.GlobalExceptionHandler;
 import com.example.demo.user.dto.LoginRequest;
 import com.example.demo.user.dto.LoginResponse;
