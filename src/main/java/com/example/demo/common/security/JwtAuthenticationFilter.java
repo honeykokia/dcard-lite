@@ -54,7 +54,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             // 去資料庫查這個人的完整資料 (包含密碼、權限)
-            // 注意：這裡可能會紅字，因為你可能還沒實作 UserDetailsService
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
             // 6. 驗證 Token 是否有效
