@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-boards
+      author: admin
+      changes:
+        - createTable:
+            tableName: boards
+            columns:
+              - column:
+                  name: board_id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_boards
+              - column:
+                  name: name
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: DATETIME(6)
+                  constraints:
+                    nullable: false
+
+
+        # UK: uk_boards_name (name)
+        # UK本身就已經擁有索引效能了
+        - addUniqueConstraint:
+            tableName: boards
+            columnNames: name
+            constraintName: uk_boards_name
