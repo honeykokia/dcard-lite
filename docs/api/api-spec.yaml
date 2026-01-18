@@ -10,6 +10,8 @@ servers:
 tags:
   - name: Auth
     description: Register & Login
+  - name: Boards
+    description: List boards
 
 paths:
   /users/register:
@@ -169,6 +171,114 @@ paths:
                     path: "/users/login"
                     timestamp: "2025-12-25T10:00:00Z"
 
+  /boards:
+    get:
+      tags: [Boards]
+      summary: List boards
+      operationId: listBoards
+      parameters:
+        - in: query
+          name: page
+          required: false
+          description: Page number (default=1, must be >=1)
+          schema:
+            type: integer
+            format: int32
+            default: 1
+            minimum: 1
+          example: 1
+        - in: query
+          name: pageSize
+          required: false
+          description: Page size (default=20, 1..100)
+          schema:
+            type: integer
+            format: int32
+            default: 20
+            minimum: 1
+            maximum: 100
+          example: 20
+        - in: query
+          name: keyword
+          required: false
+          description: Optional keyword for board name fuzzy search (blank treated as not provided; validated after trim 1..50)
+          schema:
+            type: string
+            maxLength: 50
+          example: "八卦"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListBoardsResponse"
+              examples:
+                success:
+                  value:
+                    page: 1
+                    pageSize: 20
+                    total: 2
+                    items:
+                      - boardId: 1
+                        name: "八卦版"
+                        description: "想聊什麼就聊什麼"
+                      - boardId: 2
+                        name: "軟體版"
+                        description: "聊軟體相關的知識"
+                empty:
+                  value:
+                    page: 1
+                    pageSize: 20
+                    total: 0
+                    items: []
+        "400":
+          description: Bad Request (validation failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                pageInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PAGE_INVALID"
+                    path: "/boards"
+                    timestamp: "2025-12-25T10:00:00Z"
+                pageSizeInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PAGE_SIZE_INVALID"
+                    path: "/boards"
+                    timestamp: "2025-12-25T10:00:00Z"
+                keywordInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "KEYWORD_INVALID"
+                    path: "/boards"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalError:
+                  value:
+                    status: 500
+                    error: "Internal Server Error"
+                    message: "INTERNAL_ERROR"
+                    code: "INTERNAL_ERROR"
+                    path: "/boards"
+                    timestamp: "2025-12-25T10:00:00Z"
+
 components:
   schemas:
     RegisterRequest:
@@ -261,6 +371,44 @@ components:
           type: string
           description: JWT access token
           example: "..."
+
+    BoardItem:
+      type: object
+      required: [boardId, name, description]
+      properties:
+        boardId:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          maxLength: 20
+          example: "八卦版"
+        description:
+          type: string
+          maxLength: 100
+          example: "想聊什麼就聊什麼"
+
+    ListBoardsResponse:
+      type: object
+      required: [page, pageSize, total, items]
+      properties:
+        page:
+          type: integer
+          format: int32
+          example: 1
+        pageSize:
+          type: integer
+          format: int32
+          example: 20
+        total:
+          type: integer
+          format: int64
+          example: 2
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BoardItem"
 
     ErrorResponse:
       type: object
