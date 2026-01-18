@@ -2,6 +2,7 @@ package com.example.demo.user.service;
 
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
+import com.example.demo.common.security.JwtService;
 import com.example.demo.user.dto.LoginRequest;
 import com.example.demo.user.dto.LoginResponse;
 import com.example.demo.user.dto.RegisterUserRequest;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
@@ -29,6 +31,8 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtService jwtService;
     @InjectMocks
     private UserService userService;
 
@@ -128,6 +132,7 @@ public class UserServiceTest {
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(finduser));
         when(passwordEncoder.matches(anyString(),anyString())).thenReturn(true);
+        when(jwtService.generateToken(anyMap(),any(UserDetails.class))).thenReturn("mocked_jwt_token");
 
         // == When ==
         LoginResponse response = userService.loginUser(request);
@@ -137,6 +142,7 @@ public class UserServiceTest {
         assertEquals(1L,response.getUserId());
         assertEquals("Leo",response.getDisplayName());
         assertEquals(UserRole.USER,response.getRole());
+        assertEquals(response.getAccessToken(),"mocked_jwt_token");
         assertNotNull(response.getAccessToken());
 
         verify(userRepository).findByEmail(request.getEmail());
