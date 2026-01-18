@@ -47,6 +47,9 @@ public class BoardService {
                 .collect(Collectors.toList());
 
         ListBoardsResponse response = new ListBoardsResponse();
+        response.setPage(resultPage.getNumber() + 1);
+        response.setPageSize(resultPage.getSize());
+        response.setTotal(resultPage.getTotalElements());
         response.setItems(items);
         return response;
     }
