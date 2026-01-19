@@ -25,8 +25,8 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public ListBoardsResponse listBoards(ListBoardsRequest request){
-        int page = Math.max(0, (request.getPage() == null ? 1 : request.getPage()) - 1);
-        int pageSize = request.getPageSize() == null ? 20 : request.getPageSize();
+        int page = Math.max(0, request.getPage() - 1);
+        int pageSize = request.getPageSize();
         Pageable pageable = PageRequest.of(page, pageSize);
 
         String keyword = request.getKeyword();
