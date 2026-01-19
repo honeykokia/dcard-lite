@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
@@ -38,7 +39,8 @@ public class BoardServiceTest {
 
         Board board1 = new Board(1L,"八卦版","想聊什麼就聊什麼", Instant.now());
         Board board2 = new Board(2L,"軟體版","聊軟體相關的知識", Instant.now());
-        Page<Board> mockPage = new PageImpl<>(List.of(board1,board2));
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<Board> mockPage = new PageImpl<>(List.of(board1,board2),pageable,2);
 
         when(boardRepository.findAll(any(Pageable.class))).thenReturn(mockPage);
 
