@@ -154,8 +154,9 @@ public class BoardControllerTest {
     static Stream<String> provideInvalidKeywords() {
         return Stream.of(
                 // 情境 1: 純粹超過 50 字 (51個a)
-                "a".repeat(51)
-
+                "a".repeat(51),
+                // 情境 2: 驗證 trim() 後長度依然超過 (符合 spec 定義的邊界測試)
+                " " + "a".repeat(51) + " "
         );
     }
     @ParameterizedTest
