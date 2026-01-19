@@ -30,7 +30,7 @@ public class BoardService {
         Pageable pageable = PageRequest.of(page, pageSize);
 
         String keyword = request.getKeyword();
-        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasKeyword = keyword != null;
 
         Page<Board> resultPage = hasKeyword
                 ? boardRepository.findByNameContainingIgnoreCase(keyword, pageable)
