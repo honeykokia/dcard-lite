@@ -107,7 +107,7 @@ public class BoardControllerTest {
             "-1,     PAGE_INVALID",
             "invalid,               PARAM_FORMAT_ERROR"
     })
-    void listBoards_PageInvalid_Return400(String page, String exceptException) throws Exception{
+    void listBoards_PageInvalid_Return400(String page, String exceptedErrorCode) throws Exception{
         // == When & Then ==
         mockMvc.perform(get("/boards")
                 .param("page",page) // Invalid page
@@ -115,7 +115,7 @@ public class BoardControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("VALIDATION_FAILED"))
-                .andExpect(jsonPath("$.code").value(exceptException));
+                .andExpect(jsonPath("$.code").value(exceptedErrorCode));
     }
 
 
@@ -125,15 +125,15 @@ public class BoardControllerTest {
             "101,     PAGE_SIZE_INVALID",
             "invalid,               PARAM_FORMAT_ERROR"
     })
-    void listBoards_PageSizeInvalid_Return400(String pageSize, String exceptException) throws Exception{
+    void listBoards_PageSizeInvalid_Return400(String pageSize, String exceptedErrorCode) throws Exception{
         // == When & Then ==
         mockMvc.perform(get("/boards")
-                        .param("page","1") // Invalid page
+                        .param("page","1") // Valid page (fixed), testing pageSize validation
                         .param("pageSize",pageSize)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("VALIDATION_FAILED"))
-                .andExpect(jsonPath("$.code").value(exceptException));
+                .andExpect(jsonPath("$.code").value(exceptedErrorCode));
     }
 
 
