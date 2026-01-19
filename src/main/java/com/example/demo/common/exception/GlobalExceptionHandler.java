@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -49,7 +48,7 @@ public class GlobalExceptionHandler {
         }
 
         // 2. 組裝你的固定 Response 格式
-        ErrorResponse reponse = new ErrorResponse(
+        ErrorResponse response = new ErrorResponse(
                 400,
                 "Bad Request",
                 ErrorMessage.VALIDATION_FAILED, // 固定大類
@@ -58,7 +57,7 @@ public class GlobalExceptionHandler {
                 Instant.now()
         );
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(reponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
 }
