@@ -1,16 +1,15 @@
 # rp-001-register-login
-## SDD
-### Use Case
-#### Who?
+## Use Case
+### Who?
 - User
-#### What?
+### What?
 - 使用者註冊帳號密碼
 - 使用者登入取得JWT Token
-#### Success?
+### Success?
 - 註冊成功，201 Created
 - 登入成功，200 OK
 
-### DB Changes (MySQL + Liquibase)
+## DB Changes (MySQL + Liquibase)
 - Table: `users`
     - columns（填你要的最小集合）：
         - user_id (BIGINT, PK, auto increment, NOT NULL)
@@ -23,7 +22,7 @@
         - PK: `pk_users` (user_id)
         - UK: `uq_users_email` (email)
 
-### Validation Rules
+## Validation Rules
 - name
     - 必填（不可為空字串 / 純空白；需先 `trim()`）
     - 最大長度：20
@@ -41,7 +40,7 @@
     - 必填（不可為空字串/純空白）
     - 必須與 `password` 完全相同
 
-### Error Response Format（固定格式）
+## Error Response Format（固定格式）
 
 > 本系統錯誤回應採固定格式：`message` 表示錯誤大類（如 `VALIDATION_FAILED` / `UNAUTHORIZED` / `CONFLICT` / `NOT_FOUND` / `INTERNAL_ERROR`），`code` 表示細項原因（如 `NAME_INVALID` / `EMAIL_ALREADY_EXISTS`）。
 
@@ -56,7 +55,7 @@
 }
 ```
 
-### Error Mapping（Domain → HTTP）
+## Error Mapping（Domain → HTTP）
 - **400 Bad Request**
     - `message`: `VALIDATION_FAILED`
     - `code`（例）：
@@ -149,7 +148,7 @@
     - `UNAUTHORIZED`
       - `AUTHENTICATION_FAILED`
 
-## TDD
+## TEST
 ### `POST /users/register`
 #### 註冊成功
 - Given
@@ -174,8 +173,8 @@
     - `password_hash` 不是明文、且符合 BCrypt 格式（通常以 `$2a$`/`$2b$` 開頭）
     - `created_at` 不為 null（由 DB 填）
 
-### 註冊失敗
-#### displayName 驗證失敗
+#### 註冊失敗
+##### displayName 驗證失敗
 - Given
     - request body：
         - name = "   "（純空白）
@@ -194,7 +193,7 @@
         - path = "/users/register"
         - timestamp = "..."
 
-#### email 驗證失敗
+##### email 驗證失敗
 - Given
     - request body：
         - name = "Leo"
@@ -213,7 +212,7 @@
         - path = "/users/register"
         - timestamp = "..."
 
-#### password 驗證失敗
+##### password 驗證失敗
 - Given
     - request body：
         - name = "Leo"
@@ -233,7 +232,7 @@
         - code = "PASSWORD_INVALID"
         - path = "/users/register"
         - timestamp = "..."
-#### confirmPassword 驗證失敗
+##### confirmPassword 驗證失敗
 - Given
     - request body：
         - name = "Leo"
@@ -251,7 +250,7 @@
         - code = "CONFIRM_PASSWORD_INVALID"
         - path = "/users/register"
         - timestamp = "..."
-#### email 已存在
+##### email 已存在
 - Given
     - DB 中已存在 email = `leo@example.com`
     - request body：
@@ -272,8 +271,8 @@
         - timestamp = "..."
 
 ---  
-## `POST /users/login`
-### Test Seed
+### `POST /users/login`
+#### Test Seed
 - DB 中存在一筆 users：
     - user_id = 123
     - email = "leo@example.com"
@@ -281,7 +280,7 @@
     - display_name = "Leo"
     - role = "USER"
     - created_at = "2025-12-25 10:00:00"
-### 登入成功
+#### 登入成功
 - Given : Test Seed
 - When
     - 呼叫 `POST /users/login`：
@@ -296,8 +295,8 @@
     - `accessToken` 可成功解碼並驗證（e.g. 使用 JWT library）
     - `accessToken` payload 包含正確的 userId、displayName、role
     - 登入時間在 token 的有效期限內
-### 登入失敗
-#### Email格式驗證失敗
+#### 登入失敗
+##### Email格式驗證失敗
 - Given
   - request body：
       - email = "leoexample.com" or "   " (純空白) or "" (空字串) or thisEmailIsTooLongOverOneHundredCharacters
@@ -314,7 +313,7 @@
       - path = "/users/login"
       - timestamp = "..."
       - 
-#### Password格式驗證失敗
+##### Password格式驗證失敗
 - Given
     - request body：
         - email =   "leo@example.com"
@@ -331,7 +330,7 @@
         - path = "/users/login"
         - timestamp = "..."
 
-#### Email帳號不存在
+##### Email帳號不存在
 - Given
     - request body：
         - email = "John@example.com"
@@ -347,7 +346,7 @@
         - code = "AUTHENTICATION_FAILED"
         - path = "/users/login"
         - timestamp = "..."
-#### Password錯誤認證失敗
+##### Password錯誤認證失敗
 - Given
     - request body：
         - email = "leo@example.com"

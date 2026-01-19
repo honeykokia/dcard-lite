@@ -1,5 +1,7 @@
 package com.example.demo.user.controller;
 
+import com.example.demo.common.security.JwtAuthenticationEntryPoint;
+import com.example.demo.common.security.JwtService;
 import com.example.demo.common.security.SecurityConfig;
 import com.example.demo.common.exception.GlobalExceptionHandler;
 import com.example.demo.user.dto.LoginRequest;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -39,6 +42,15 @@ public class UserControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Test
     void registerUser_Success() throws Exception {
