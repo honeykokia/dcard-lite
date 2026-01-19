@@ -37,7 +37,7 @@ public class BoardServiceTest {
         listBoardsRequest.setPageSize(20);
 
         Board board1 = new Board(1L,"八卦版","想聊什麼就聊什麼", Instant.now());
-        Board board2 = new Board(1L,"軟體版","聊軟體相關的知識", Instant.now());
+        Board board2 = new Board(2L,"軟體版","聊軟體相關的知識", Instant.now());
         Page<Board> mockPage = new PageImpl<>(List.of(board1,board2));
 
         when(boardRepository.findAll(any(Pageable.class))).thenReturn(mockPage);
