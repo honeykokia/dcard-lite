@@ -143,7 +143,6 @@ public class UserServiceTest {
         assertEquals("Leo",response.getDisplayName());
         assertEquals(UserRole.USER,response.getRole());
         assertEquals(response.getAccessToken(),"mocked_jwt_token");
-        assertNotNull(response.getAccessToken());
 
         verify(userRepository).findByEmail(request.getEmail());
         verify(passwordEncoder).matches(request.getPassword(), finduser.getPasswordHash());
