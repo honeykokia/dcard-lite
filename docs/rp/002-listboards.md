@@ -20,8 +20,7 @@
     - Constraints
         - PK: pk_boards (board_id)
         - UK: uk_boards_name (name)
-    - Index
-        - idx_boards_name (name)
+
 
 ## Validation Rules
 - page
