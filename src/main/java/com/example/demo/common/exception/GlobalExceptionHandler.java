@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 
 
-@Slf4j
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
