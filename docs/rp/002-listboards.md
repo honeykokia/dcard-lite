@@ -17,7 +17,7 @@
         - name (VARCHAR(20), UK, NOT NULL)
         - description (VARCHAR(100), NOT NULL)
         - created_at (DATETIME(6), NOT NULL)
-    - Constrains
+    - Constraints
         - PK: pk_boards (board_id)
         - UK: uk_boards_name (name)
     - Index
@@ -103,9 +103,9 @@
 }
 ```
 
-#### Erros（本API會用到的）
+#### Errors（本API會用到的）
 - **400 Bad Request**
-    - `VALIDATION_FAILED
+    - `VALIDATION_FAILED`
         - `PAGE_INVALID`
         - `PAGE_SIZE_INVALID`
         - `KEYWORD_INVALID`
