@@ -16,7 +16,7 @@ import java.time.Instant;
 @Table(
     name = "boards",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_boards_name",columnNames = {"name"})
+        @UniqueConstraint(name = "uk_boards_name", columnNames = {"name"})
     }
 )
 public class Board {
