@@ -9,6 +9,7 @@ public enum BoardErrorCode implements ErrorCode {
     KEYWORD_INVALID;
 
 
+    @Override
     public String code() {
         return name();
     }
