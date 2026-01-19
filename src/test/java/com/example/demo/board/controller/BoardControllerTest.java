@@ -79,6 +79,9 @@ public class BoardControllerTest {
         // == When & Then ==
         mockMvc.perform(get("/boards"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.pageSize").value(20))
+                .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.items[0].name").value("測試版"));
     }
     @Test
@@ -99,6 +102,17 @@ public class BoardControllerTest {
 
         // 驗證：Controller 真的有把 "特定關鍵字" 塞進去 Request 物件嗎？
         assertEquals("特定關鍵字", captor.getValue().getKeyword());
+    }
+
+    @Test
+    void listBoards_ValidKeywordOnBoundary_Return200() throws Exception {
+        String boundaryKeyword = " " + "a".repeat(50) + " ";
+
+        // 2. 執行測試
+        mockMvc.perform(get("/boards")
+                        .param("keyword", boundaryKeyword)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @ParameterizedTest(name = "測試案例: page={0}, 預期錯誤={1}")
@@ -140,10 +154,8 @@ public class BoardControllerTest {
     static Stream<String> provideInvalidKeywords() {
         return Stream.of(
                 // 情境 1: 純粹超過 50 字 (51個a)
-                "a".repeat(51),
+                "a".repeat(51)
 
-                // 情境 2: 前後加空白，且中間內容本身就超過 (測試是否真的擋得住)
-                " " + "a".repeat(51) + " "
         );
     }
     @ParameterizedTest

@@ -47,9 +47,12 @@ public class BoardServiceTest {
 
         // == Then ==
         assertEquals(response.getItems().size(),2);
+        assertEquals(response.getPage(),1);
+        assertEquals(response.getPageSize(),20);
+        assertEquals(response.getTotal(),2);
 
         verify(boardRepository, times(1)).findAll(any(Pageable.class));
-        verify(boardRepository, times(0)).findByNameContainingIgnoreCase(eq("八卦"), any(Pageable.class));
+        verify(boardRepository, times(0)).findByNameContainingIgnoreCase(anyString(), any(Pageable.class));
 
     }
 
