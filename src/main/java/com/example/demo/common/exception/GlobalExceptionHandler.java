@@ -3,6 +3,7 @@ package com.example.demo.common.exception;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,6 +73,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(
             MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+
+        return buildErrorResponse("PATH_FORMAT_ERROR", request);
+    }
+
+    // 4. 處理「違反驗證規則」的錯誤 (例如：@Min, @NotBlank 在 PathVariable 上失效)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex, HttpServletRequest request) {
 
         return buildErrorResponse("PATH_FORMAT_ERROR", request);
     }
