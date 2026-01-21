@@ -62,7 +62,7 @@
 - **500 Internal Server Error**
     - `message`：`INTERNAL_ERROR`
     - `code`：
-        - `INTERNAL_ERROR`
+        - `UNEXPECTED_ERROR`
             - DB/Repository error 或未預期error
 
 ## API Contract
@@ -110,7 +110,7 @@
         - `KEYWORD_INVALID`
 - **500 Internal Server Error**
     - `INTERNAL_ERROR`
-        - `INTERNAL_ERROR`
+        - `UNEXPECTED_ERROR`
 
 ## Internal Design (Service & Repository)
 ### Use Case: ListBoards
@@ -166,6 +166,8 @@ Page<Board> findAll(Pageable pageable);
 - Given：Test Seed
 - When：呼叫 `GET /boards`
 - Then：
+    - status：
+        - 200 ok
     - response body：
         - `page` = 1
         - `pageSize` = 20
@@ -183,6 +185,8 @@ Page<Board> findAll(Pageable pageable);
 - Given：Test Seed
 - When：呼叫 `GET /boards?keyword="八卦"`
 - Then：
+    - status：
+        - 200 ok
     - response body：
         - `page` = 1
         - `pageSize` = 20
@@ -197,6 +201,8 @@ Page<Board> findAll(Pageable pageable);
 - Given：Test Seed
 - When：呼叫 `GET /boards?keyword="棒球"`
 - Then：
+    - status：
+        - 200 ok
     - response body：
         - `page` = 1
         - `pageSize` = 20
@@ -217,6 +223,8 @@ Page<Board> findAll(Pageable pageable);
 - When：
     - 呼叫 `GET /boards?page=page_input`
 - Then：
+    - status：
+        - 400 Bad Request
     - response body：
         - `status` = 400
         - `error` = "Bad Request"
@@ -233,6 +241,8 @@ Page<Board> findAll(Pageable pageable);
 - When：
     - 呼叫 `GET /boards?pageSize=page_size_input`
 - Then：
+    - status：
+        - 400 Bad Request
     - response body：
         - `status` = 400
         - `error` = "Bad Request"
@@ -248,6 +258,8 @@ Page<Board> findAll(Pageable pageable);
 - When：
     - 呼叫 `GET /boards?keyword=keyword_input`
 - Then：
+    - status：
+        - 400 Bad Request
     - response body：
         - `status` = 400
         - `error` = "Bad Request"
