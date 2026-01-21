@@ -273,7 +273,7 @@ public class BoardControllerTest {
                 .andExpect(jsonPath("$.code").value(PostErrorCode.TITLE_INVALID.name()));
     }
 
-    static Stream<Arguments> provideInvalidBodys() {
+    static Stream<Arguments> provideInvalidBodies() {
         return Stream.of(
                 // 情境 1: 空字串
                 Arguments.of(""),
@@ -288,7 +288,7 @@ public class BoardControllerTest {
         );
     }
     @ParameterizedTest(name = "內容測試: body={0} 應回傳 400")
-    @MethodSource("provideInvalidBodys")
+    @MethodSource("provideInvalidBodies")
     void createPost_BodyInvalid_Return400(String body) throws Exception {
         // == Given ==
         long boardId = 2L;
