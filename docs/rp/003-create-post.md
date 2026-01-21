@@ -21,7 +21,7 @@
         - hot_score (DOUBLE, NOT NULL, DEFAULT=0)
         - status (VARCHAR(20), NOT NULL, DEFAULT='ACTIVE')
         - created_at (DATETIME(6), NOT NULL)
-        - update_at (DATETIME(6), NOT NULL)
+        - updated_at (DATETIME(6), NOT NULL)
     - Constraints
         - PK: `pk_posts` (post_id)
         - FK:
@@ -121,20 +121,20 @@
 - **401 Unauthorized**
     - `UNAUTHORIZED`
         - `SECURITY_UNAUTHORIZED`
-- **404 Not Found **
+- **404 Not Found**
     - `NOT_FOUND`
         - `BOARD_NOT_FOUND`
 - **500 Internal Server Error**
     - `INTERNAL_ERROR`
         - `UNEXPECTED_ERROR`
 
-## Internal Design (Service & Respository)
+## Internal Design (Service & Repository)
 ### Use Case: createPost
 - **Method Signature**
 ```java
 CreatePostResponse createPost(long boardId, long userId, CreatePostRequest request);
 ```
-- **Transation**
+- **Transaction**
     - `@Transactional`
 - **Input Model**
     - `boardId` (Long)
@@ -306,7 +306,7 @@ findById(long userId);
         - timestamp = "..."
 ##### 看板不存在
 - Given:
-    - `PathVariable
+    - `PathVariable`
         - boardId = 3 (DB不存在)
     - `RequestBody`
         - title = "關於SpringBoot的問題"
