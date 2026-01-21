@@ -3,13 +3,15 @@ package com.example.demo.common.exception;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.ConstraintViolation;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 
@@ -34,32 +36,59 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
+    // 1. 處理 DTO 驗證失敗 (@Valid, @RequestBody)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(
+    public ResponseEntity<ErrorResponse> handleDtoValidation(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
 
-        // 1. 取得 @NotNull(message="NAME_INVALID") 裡面的字串
         String errorCode = ex.getBindingResult().getFieldErrors().stream()
-                .findFirst() // 1. 安全地嘗試抓第一個，抓不到就是 Optional.empty
+                .findFirst()
                 .map(error -> {
-                    // 2. 這裡放入你原本的邏輯
-                    if (error.isBindingFailure()) {
-                        return "PARAM_FORMAT_ERROR"; // 如果是型別轉換失敗 (如 String 轉 int)
-                    }
-                    return error.getDefaultMessage(); // 如果是驗證失敗 (@NotNull, @Size)
+                    if (error.isBindingFailure()) return "PARAM_FORMAT_ERROR"; // JSON 欄位型別錯
+                    return error.getDefaultMessage(); // DTO 上的 message
                 })
-                .orElse("UNKNOWN_ERROR"); // 3. 如果真的完全沒錯誤 (List為空) 的預設值
+                .orElse("VALIDATION_FAILED");
 
-        // 2. 組裝你的固定 Response 格式
+        return buildErrorResponse(errorCode, request);
+    }
+
+    // 2. 處理路徑參數驗證失敗 (@Validated, @PathVariable, e.g. "-1")
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handlePathValidation(
+            HandlerMethodValidationException ex, HttpServletRequest request) {
+
+        String errorCode = ex.getParameterValidationResults().stream()
+                // 1. 拿出所有參數的驗證結果
+                .flatMap(result -> result.getResolvableErrors().stream())
+                // 2. 找到第一個錯誤
+                .findFirst()
+                // 3. 取得你在 @Positive(message="PATH_FORMAT_ERROR") 裡寫的訊息
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .orElse("VALIDATION_FAILED");
+
+        return buildErrorResponse(errorCode, request);
+    }
+
+    // 3. 處理路徑參數型別錯誤 (e.g. "abc" 轉不成 Long)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+
+        return buildErrorResponse("PATH_FORMAT_ERROR", request);
+    }
+
+    // ==========================================
+    // 👇 私有共用方法：統一負責 "組裝" 回傳格式
+    // ==========================================
+    private ResponseEntity<ErrorResponse> buildErrorResponse(String errorCode, HttpServletRequest request) {
         ErrorResponse response = new ErrorResponse(
                 400,
                 "Bad Request",
-                ErrorMessage.VALIDATION_FAILED, // 固定大類
-                errorCode,          // 動態細項
+                ErrorMessage.VALIDATION_FAILED, // 大類
+                errorCode,          // 細項 (從上面傳進來的)
                 request.getRequestURI(),
                 Instant.now()
         );
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
