@@ -536,7 +536,7 @@ components:
           type: string
           description: Post body (validated after trim, allows `\n`, no `<` or `>`)
           maxLength: 300
-          example: "請問怎麼建立一個SpringBoot Mavan專案"
+          example: "請問怎麼建立一個SpringBoot Maven專案"
 
     CreatePostResponse:
       type: object
