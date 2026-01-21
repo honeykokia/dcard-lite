@@ -87,6 +87,7 @@ public class UserControllerTest {
     }
 
     @ParameterizedTest
+    @NullSource
     @ValueSource(strings = {
             "",
             "  ",
@@ -94,7 +95,6 @@ public class UserControllerTest {
             "123456",
             "!@#$%"
     })
-    @NullSource
     void registerUser_NameInvalid_Return400(String invalidName) throws Exception {
         // == Given ==
         RegisterUserRequest request = new RegisterUserRequest();
@@ -290,7 +290,7 @@ public class UserControllerTest {
     void loginUser_EmailDoesNotExist_Return401() throws Exception {
         // == Given ==
         LoginRequest request = new LoginRequest();
-        request.setEmail("inavlidEmail");
+        request.setEmail("invalidEmail");
         request.setPassword("abc12345");
         given(userService.loginUser(any(LoginRequest.class))).willThrow(new ApiException(ErrorMessage.UNAUTHORIZED, UserErrorCode.AUTHENTICATION_FAILED));
 
