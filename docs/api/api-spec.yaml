@@ -306,7 +306,7 @@ paths:
               example:
                 value:
                   title: "關於SpringBoot的問題"
-                  body: "請問怎麼建立一個SpringBoot Mavan專案"
+                  body: "請問怎麼建立一個SpringBoot Maven專案"
       responses:
         "201":
           description: Created
