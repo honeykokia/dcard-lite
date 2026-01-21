@@ -41,7 +41,7 @@ public class BoardController {
             @Valid @RequestBody CreatePostRequest request
     ) {
         long userId = user.getUserId();
-        CreatePostResponse response = postService.createPost(boardId,userId,request);
+        CreatePostResponse response = postService.createPost(boardId, userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -76,7 +76,7 @@ public class PostServiceTest {
         CreatePostResponse response = postService.createPost(boardId, userId, request);
 
         // == Then ==
-        assertEquals(response.getPostId(),100L);
+        assertEquals(response.getPostId(), 100L);
 
         // 這就是你計畫中提到的「驗證真的存對看板、驗證作者是對的」
         ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
