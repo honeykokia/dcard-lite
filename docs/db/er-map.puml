@@ -29,7 +29,7 @@ entity "Post" as Post {
   * hot_score : DOUBLE <<default: 0>>
   * status : VARCHAR(20) <<default: 'ACTIVE'>>
   * created_at : DATETIME(6)
-  * update_at : DATETIME(6)
+  * updated_at : DATETIME(6)
 }
 
 Board ||--o{ Post : "has posts"
