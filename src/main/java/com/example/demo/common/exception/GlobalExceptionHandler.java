@@ -3,7 +3,6 @@ package com.example.demo.common.exception;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.error.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolation;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
