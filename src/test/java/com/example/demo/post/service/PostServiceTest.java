@@ -97,7 +97,7 @@ public class PostServiceTest {
         long userId = 1L;
         CreatePostRequest mockRequest = new CreatePostRequest();
         mockRequest.setTitle("關於SpringBoot的問題");
-        mockRequest.setBody("請問怎麼建立一個SpringBoot Mavan專案");
+        mockRequest.setBody("請問怎麼建立一個SpringBoot Maven專案");
 
         given(boardRepository.findById(nonExistBoardId)).willReturn(Optional.empty());
         // == When ==
@@ -123,7 +123,7 @@ public class PostServiceTest {
         long nonExistUserId = 99L;
         CreatePostRequest mockRequest = new CreatePostRequest();
         mockRequest.setTitle("關於SpringBoot的問題");
-        mockRequest.setBody("請問怎麼建立一個SpringBoot Mavan專案");
+        mockRequest.setBody("請問怎麼建立一個SpringBoot Maven專案");
 
         Board mockBoard = new Board();
         mockBoard.setBoardId(boardId);

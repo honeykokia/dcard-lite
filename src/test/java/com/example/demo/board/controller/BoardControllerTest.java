@@ -205,13 +205,13 @@ public class BoardControllerTest {
 
         CreatePostRequest mockRequest = new CreatePostRequest();
         mockRequest.setTitle("關於SpringBoot的問題");
-        mockRequest.setBody("請問怎麼建立一個SpringBoot Mavan專案");
+        mockRequest.setBody("請問怎麼建立一個SpringBoot Maven專案");
 
 
-        CreatePostResponse mcokResponse = new CreatePostResponse();
-        mcokResponse.setPostId(1L);
+        CreatePostResponse mockResponse = new CreatePostResponse();
+        mockResponse.setPostId(1L);
         given(postService.createPost(eq(boardId), anyLong(), any(CreatePostRequest.class)
-        )).willReturn(mcokResponse);
+        )).willReturn(mockResponse);
 
         // == When ==
         ResultActions performResult = mockMvc.perform(post("/boards/{boardId}/posts", boardId)
@@ -238,8 +238,8 @@ public class BoardControllerTest {
                 Arguments.of(""),
                 // 情境 2: 全空白
                 Arguments.of("    "),
-                // 情境 3: 超過 100 字 (101個a)
-                Arguments.of("a".repeat(101)),
+                // 情境 3: 超過 50 字 (51個a)
+                Arguments.of("a".repeat(51)),
                 // 情境 4: null
                 Arguments.of((String) null),
                 // 情境 5: 包含 < >
@@ -258,7 +258,7 @@ public class BoardControllerTest {
         mockUser.setRole(UserRole.USER);
         CreatePostRequest mockRequest = new CreatePostRequest();
         mockRequest.setTitle(title);
-        mockRequest.setBody("請問怎麼建立一個SpringBoot Mavan專案");
+        mockRequest.setBody("請問怎麼建立一個SpringBoot Maven專案");
 
         // == When ==
         ResultActions performResult = mockMvc.perform(post("/boards/{boardId}/posts", boardId)
@@ -279,7 +279,7 @@ public class BoardControllerTest {
                 Arguments.of(""),
                 // 情境 2: 全空白
                 Arguments.of("    "),
-                // 情境 3: 超過 100 字 (101個a)
+                // 情境 3: 超過 300 字 (301個a)
                 Arguments.of("a".repeat(301)),
                 // 情境 4: null
                 Arguments.of((String) null),
@@ -287,7 +287,7 @@ public class BoardControllerTest {
                 Arguments.of("<script>alert('hack')</script>")
         );
     }
-    @ParameterizedTest(name = "標題測試: body={0} 應回傳 400")
+    @ParameterizedTest(name = "內容測試: body={0} 應回傳 400")
     @MethodSource("provideInvalidBodys")
     void createPost_BodyInvalid_Return400(String body) throws Exception {
         // == Given ==
@@ -328,7 +328,7 @@ public class BoardControllerTest {
         mockUser.setRole(UserRole.USER);
         CreatePostRequest mockRequest = new CreatePostRequest();
         mockRequest.setTitle("關於SpringBoot的問題");
-        mockRequest.setBody("請問怎麼建立一個SpringBoot Mavan專案");
+        mockRequest.setBody("請問怎麼建立一個SpringBoot Maven專案");
 
         // == When ==
         ResultActions performResult = mockMvc.perform(post("/boards/{boardId}/posts", invalidBoardId)
@@ -374,7 +374,7 @@ public class BoardControllerTest {
 
         CreatePostRequest mockRequest = new CreatePostRequest();
         mockRequest.setTitle("關於SpringBoot的問題");
-        mockRequest.setBody("請問怎麼建立一個SpringBoot Mavan專案");
+        mockRequest.setBody("請問怎麼建立一個SpringBoot Maven專案");
 
         given(postService.createPost(eq(nonExistBoardId), anyLong(), any(CreatePostRequest.class)))
                 .willThrow(new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.BOARD_NOT_FOUND));
