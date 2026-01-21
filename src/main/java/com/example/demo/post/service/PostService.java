@@ -12,6 +12,7 @@ import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostService {
@@ -26,6 +27,7 @@ public class PostService {
         this.boardRepository = boardRepository;
     }
 
+    @Transactional
     public CreatePostResponse createPost(
             long boardId,
             long userId,
@@ -45,7 +47,6 @@ public class PostService {
         post.setAuthor(author);
         post.setTitle(request.getTitle());
         post.setBody(request.getBody());
-        post.setStatus("ACTIVE");
 
         // 保存 Post
         Post savedPost = postRepository.save(post);
