@@ -266,7 +266,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void loginUser_AuthFailed_Return401() throws Exception {
+    void loginUser_IncorrectPassword_Return401() throws Exception {
         // == Given ==
         LoginRequest request = new LoginRequest();
         request.setEmail("leo@example.com");
@@ -290,8 +290,8 @@ public class UserControllerTest {
     void loginUser_EmailDoesNotExist_Return401() throws Exception {
         // == Given ==
         LoginRequest request = new LoginRequest();
-        request.setEmail("leo@example.com");
-        request.setPassword("wrong_password");
+        request.setEmail("inavlidEmail");
+        request.setPassword("abc12345");
         given(userService.loginUser(any(LoginRequest.class))).willThrow(new ApiException(ErrorMessage.UNAUTHORIZED, UserErrorCode.AUTHENTICATION_FAILED));
 
         // == When ==
