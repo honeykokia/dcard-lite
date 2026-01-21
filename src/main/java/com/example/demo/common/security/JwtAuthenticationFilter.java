@@ -37,8 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String uri = request.getRequestURI();
         String remoteAddr = request.getRemoteAddr(); // 取得對方的 IP
 
-        // 印出 INFO 級別的 Log
-        log.info("Incoming Request: [{} {}] from IP: {}", method, uri, remoteAddr);
+        // 印出 DEBUG 級別的 Log
+        log.debug("Incoming Request: [{} {}] from IP: {}", method, uri, remoteAddr);
 
         // 1. 從 Header 取得 Authorization 欄位
         final String authHeader = request.getHeader("Authorization");
