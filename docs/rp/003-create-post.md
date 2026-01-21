@@ -190,7 +190,7 @@ findById(long userId);
         - boardId = 2
     - `RequestBody`
         - title = "關於SpringBoot的問題"
-        - body = "請問怎麼建立一個SpringBoot Mavan專案"
+        - body = "請問怎麼建立一個SpringBoot Maven專案"
 - When:
     - 呼叫 `POST /boards/2/posts`
 - Then:
@@ -201,7 +201,7 @@ findById(long userId);
 - And:
     - DB 中新增一筆 posts
         - title = "關於SpringBoot的問題"
-        - body = "請問怎麼建立一個SpringBoot Mavan專案"
+        - body = "請問怎麼建立一個SpringBoot Maven專案"
         - **board_id = 2** (驗證真的存對看板)
         - **author_id = 1** (驗證作者是當初登入的人)
         - like_count = 0
@@ -222,7 +222,7 @@ findById(long userId);
             - `<idsahjgoasdg>`
             - a.repeat(51)
         - title = `title_input`
-        - body = "請問怎麼建立一個SpringBoot Mavan專案"
+        - body = "請問怎麼建立一個SpringBoot Maven專案"
 - When:
     - 呼叫 `POST /boards/2/posts`
 - Then:
@@ -269,7 +269,7 @@ findById(long userId);
         - boardId = `boardId_input`
     - `RequestBody`
         - title = "關於SpringBoot的問題"
-        - body = "請問怎麼建立一個SpringBoot Mavan專案"
+        - body = "請問怎麼建立一個SpringBoot Maven專案"
 - When:
     - 呼叫 `POST /boards/boardId_input/posts`
 - Then:
@@ -291,7 +291,7 @@ findById(long userId);
         - boardId = 2
     - `RequestBody`
         - title = "關於SpringBoot的問題"
-        - body = "請問怎麼建立一個SpringBoot Mavan專案"
+        - body = "請問怎麼建立一個SpringBoot Maven專案"
 - When:
     - 呼叫 `POST /boards/2/posts`
 - Then:
@@ -310,7 +310,7 @@ findById(long userId);
         - boardId = 3 (DB不存在)
     - `RequestBody`
         - title = "關於SpringBoot的問題"
-        - body = "請問怎麼建立一個SpringBoot Mavan專案"
+        - body = "請問怎麼建立一個SpringBoot Maven專案"
 - When:
     - 呼叫 `POST /boards/3/posts`
 - Then:
