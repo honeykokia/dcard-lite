@@ -10,11 +10,11 @@ public class CreatePostRequest {
 
     @NotBlank(message = "TITLE_INVALID")
     @Size(max = 50, message = "TITLE_INVALID")
-    @Pattern(regexp = "^(?!.*[<>]).*$", message = "TITLE_INVALID") // 禁止 < 和 >
+    @Pattern(regexp = "^[^<>]+$", message = "TITLE_INVALID") // 禁止 < 和 >
     private String title;
 
     @NotBlank(message = "BODY_INVALID")
     @Size(max = 300, message = "BODY_INVALID")
-    @Pattern(regexp = "^(?!.*[<>]).*$", message = "BODY_INVALID") // 禁止 < 和 >
+    @Pattern(regexp = "^[^<>]+$", message = "BODY_INVALID") // 禁止 < 和 >
     private String body;
 }
