@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changes/002-create-boards.yaml
   - include:
       file: db/changelog/changes/003-create-posts.yaml
+  - include:
+      file: db/changelog/changes/004-fix-typo-posts.yaml

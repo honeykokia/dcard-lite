@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-fix-typo-posts
+      author: admin
+      changes:
+        - renameColumn:
+            tableName: posts
+            oldColumnName: update_at
+            newColumnName: updated_at
+            columnDataType: DATETIME(6)
