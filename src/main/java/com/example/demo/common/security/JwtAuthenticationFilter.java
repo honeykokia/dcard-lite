@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor // Lombok 會幫忙生成 final 欄位的建構子 (DI)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -29,6 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+
+        // 取得基本資訊
+        String method = request.getMethod();
+        String uri = request.getRequestURI();
+        String remoteAddr = request.getRemoteAddr(); // 取得對方的 IP
+
+        // 印出 INFO 級別的 Log
+        log.info("Incoming Request: [{} {}] from IP: {}", method, uri, remoteAddr);
 
         // 1. 從 Header 取得 Authorization 欄位
         final String authHeader = request.getHeader("Authorization");
