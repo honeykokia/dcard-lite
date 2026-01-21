@@ -279,7 +279,120 @@ paths:
                     path: "/boards"
                     timestamp: "2025-12-25T10:00:00Z"
 
+  /boards/{boardId}/posts:
+    post:
+      tags: [Boards]
+      summary: Create a post in a specific board
+      security:
+        - bearerAuth: []
+      operationId: createPost
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          description: The ID of the board where the post will be created
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostRequest"
+            examples:
+              example:
+                value:
+                  title: "關於SpringBoot的問題"
+                  body: "請問怎麼建立一個SpringBoot Maven專案"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePostResponse"
+              examples:
+                success:
+                  value:
+                    postId: 1
+        "400":
+          description: Bad Request (validation failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                titleInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "TITLE_INVALID"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+                bodyInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "BODY_INVALID"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "401":
+          description: Unauthorized (authentication failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorized:
+                  value:
+                    status: 401
+                    error: "Unauthorized"
+                    message: "UNAUTHORIZED"
+                    code: "SECURITY_UNAUTHORIZED"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "404":
+          description: Not Found (board does not exist)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                boardNotFound:
+                  value:
+                    status: 404
+                    error: "Not Found"
+                    message: "NOT_FOUND"
+                    code: "BOARD_NOT_FOUND"
+                    path: "/boards/3/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalError:
+                  value:
+                    status: 500
+                    error: "Internal Server Error"
+                    message: "INTERNAL_ERROR"
+                    code: "UNEXPECTED_ERROR"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+
 components:
+  securitySchemes:
+      bearerAuth:            # 這個名稱可以自訂，稍後套用時會用到
+        type: http
+        scheme: bearer
+        bearerFormat: JWT    # 提示使用者這是 JWT 格式
   schemas:
     RegisterRequest:
       type: object
@@ -409,6 +522,30 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BoardItem"
+
+    CreatePostRequest:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+          description: Post title (validated after trim, no `<` or `>`)
+          maxLength: 50
+          example: "關於SpringBoot的問題"
+        body:
+          type: string
+          description: Post body (validated after trim, allows `\n`, no `<` or `>`)
+          maxLength: 300
+          example: "請問怎麼建立一個SpringBoot Maven專案"
+
+    CreatePostResponse:
+      type: object
+      required: [postId]
+      properties:
+        postId:
+          type: integer
+          format: int64
+          example: 1
 
     ErrorResponse:
       type: object

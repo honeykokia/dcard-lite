@@ -1,0 +1,37 @@
+@startuml
+entity "User" as User {
+  * user_id : BIGINT <<PK>>
+  --
+  * email : VARCHAR(100) <<UK>>
+  * password_hash : VARCHAR(200)
+  * display_name : VARCHAR(20)
+  * role : VARCHAR(10) <<default: 'USER'>>
+  * created_at : DATETIME(6)
+}
+
+entity "Board" as Board {
+  * board_id : BIGINT <<PK>>
+  --
+  * name : VARCHAR(20) <<UK>>
+  * description : VARCHAR(100)
+  * created_at : DATETIME(6)
+}
+
+entity "Post" as Post {
+  * post_id : BIGINT <<PK>>
+  --
+  * board_id : BIGINT <<FK>>
+  * author_id : BIGINT <<FK>>
+  * title : VARCHAR(50)
+  * body : VARCHAR(300)
+  * like_count : INT <<default: 0>>
+  * comment_count : INT <<default: 0>>
+  * hot_score : DOUBLE <<default: 0>>
+  * status : VARCHAR(20) <<default: 'ACTIVE'>>
+  * created_at : DATETIME(6)
+  * updated_at : DATETIME(6)
+}
+
+Board ||--o{ Post : "has posts"
+User ||--o{ Post : "creates posts"
+@enduml
