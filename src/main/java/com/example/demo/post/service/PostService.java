@@ -13,8 +13,6 @@ import com.example.demo.user.entity.User;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class PostService {
 
