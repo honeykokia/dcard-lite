@@ -349,7 +349,7 @@ public class BoardControllerTest {
         long boardId = 2L;
         CreatePostRequest mockRequest = new CreatePostRequest();
         mockRequest.setTitle("關於SpringBoot的問題");
-        mockRequest.setBody("請問怎麼建立一個SpringBoot Mavan專案");
+        mockRequest.setBody("請問怎麼建立一個SpringBoot Maven專案");
 
         // == When ==
         ResultActions result = mockMvc.perform(post("/boards/{boardId}/posts", boardId)
