@@ -24,7 +24,7 @@ public class WebConfig implements WebMvcConfigurer {
                 } catch (IllegalArgumentException e) {
                     // 3. 如果亂打 (例如 sort=abc)，這裡決定要報錯還是給預設值
                     // 回傳 LATEST 代表容錯；拋出錯誤代表嚴格檢查
-                    return PostSort.LATEST;
+                    throw e;
                 }
             }
         });
