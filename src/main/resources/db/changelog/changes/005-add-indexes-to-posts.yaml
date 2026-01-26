@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-add-indexes-to-posts
+      author: admin
+      changes:
+        - createIndex:
+            tableName: posts
+            indexName: idx_posts_board_created
+            columns:
+              - columnName: board_id
+              - columnName: created_at
+        - createIndex:
+            tableName: posts
+            indexName: idx_posts_board_hot
+            columns:
+              - columnName: board_id
+              - columnName: hot_score
+
