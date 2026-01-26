@@ -5,6 +5,8 @@ import com.example.demo.board.dto.ListBoardsResponse;
 import com.example.demo.board.service.BoardService;
 import com.example.demo.post.dto.CreatePostRequest;
 import com.example.demo.post.dto.CreatePostResponse;
+import com.example.demo.post.dto.ListPostsRequest;
+import com.example.demo.post.dto.ListPostsResponse;
 import com.example.demo.post.service.PostService;
 import com.example.demo.user.entity.User;
 import jakarta.validation.Valid;
@@ -31,6 +33,14 @@ public class BoardController {
     public ResponseEntity<ListBoardsResponse> listBoards(@Valid @ModelAttribute ListBoardsRequest request) {
 
         ListBoardsResponse response = boardService.listBoards(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{boardId}/posts")
+    public ResponseEntity<?> listPosts(
+            @PathVariable @Positive(message = "PATH_FORMAT_ERROR") Long boardId,
+            @Valid @ModelAttribute ListPostsRequest request) {
+        ListPostsResponse response = postService.listPosts(boardId,  request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
