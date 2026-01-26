@@ -4,9 +4,10 @@ import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
-import com.example.demo.post.dto.CreatePostRequest;
-import com.example.demo.post.dto.CreatePostResponse;
+import com.example.demo.post.dto.*;
 import com.example.demo.post.entity.Post;
+import com.example.demo.post.enums.PostSort;
+import com.example.demo.post.enums.PostStatus;
 import com.example.demo.post.error.PostErrorCode;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.entity.User;
@@ -18,13 +19,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -87,7 +92,7 @@ public class PostServiceTest {
         assertEquals(post.getBoard().getBoardId(),boardId);
         assertEquals(post.getAuthor().getUserId(),userId);
         assertEquals(post.getTitle(),"關於SpringBoot");
-        assertEquals(post.getStatus(),"ACTIVE");
+        assertEquals(post.getStatus(),PostStatus.ACTIVE);
     }
 
     @Test
@@ -145,5 +150,136 @@ public class PostServiceTest {
         verify(boardRepository).findById(boardId);
         verify(userRepository).findById(nonExistUserId);
         verify(postRepository, never()).save(any());
+    }
+
+    @Test
+    void listPosts_Success() {
+        // == Given ==
+        long boardId = 2L;
+
+        ListPostsRequest mockRequest = new ListPostsRequest();
+        mockRequest.setPage(1);
+        mockRequest.setPageSize(40);
+        mockRequest.setSort(PostSort.LATEST);
+
+        Board mockBoard = new Board();
+        mockBoard.setBoardId(boardId);
+        mockBoard.setName("軟體版");
+        mockBoard.setDescription("聊軟體相關的知識");
+        mockBoard.setCreatedAt(Instant.now());
+
+        User mockUser = new User();
+        mockUser.setUserId(1L);
+        mockUser.setDisplayName("Leo");
+        mockUser.setRole(UserRole.USER);
+
+        PostItem postItem1 = new PostItem();
+        postItem1.setPostId(1L);
+        postItem1.setBoardId(boardId);
+        postItem1.setBoardName("軟體版");
+        postItem1.setAuthorId(1L);
+        postItem1.setAuthorName("Leo");
+        postItem1.setTitle("關於SpringBoot的問題");
+        postItem1.setLikeCount(0);
+        postItem1.setHotScore(0.0);
+        postItem1.setStatus(PostStatus.ACTIVE);
+        postItem1.setCreatedAt(LocalDateTime.of(2025,12,25,10,0,0).toInstant(ZoneOffset.UTC));
+
+        PostItem postItem2 = new PostItem();
+        postItem2.setPostId(2L);
+        postItem2.setBoardId(boardId);
+        postItem2.setBoardName("軟體版");
+        postItem2.setAuthorId(1L);
+        postItem2.setAuthorName("Leo");
+        postItem2.setTitle("關於JAVA問題?");
+        postItem2.setLikeCount(0);
+        postItem2.setHotScore(0.0);
+        postItem2.setStatus(PostStatus.ACTIVE);
+        postItem2.setCreatedAt(LocalDateTime.of(2026,1,1,12,0,0).toInstant(ZoneOffset.UTC));
+
+        Pageable mockPageable = PageRequest.of(0, 40, Sort.by("createdAt").descending());
+        Page<PostItem> mockPage = new PageImpl<>(List.of(postItem1, postItem2), mockPageable, 2);
+        given(boardRepository.findById(boardId)).willReturn(Optional.of(mockBoard));
+        given(postRepository.findByBoardId(eq(boardId),any(Pageable.class))).willReturn(mockPage);
+
+        // == When ==
+        ListPostsResponse response = postService.listPosts(boardId, mockRequest);
+
+        // == Then ==
+        ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(postRepository).findByBoardId(eq(boardId), pageCaptor.capture());
+        Pageable capturedPageable = pageCaptor.getValue();
+        assertEquals(0,capturedPageable.getPageNumber());
+        assertEquals(40,capturedPageable.getPageSize());
+        assertEquals(Sort.by("p.createdAt").descending(),capturedPageable.getSort());
+        assertEquals(response.getItems().size(),2);
+
+        verify(boardRepository).findById(boardId);
+        verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
+
+    }
+
+    @Test
+    void lisPosts_HotSort_Success() {
+        // == Given ==
+        long boardId = 2L;
+
+        ListPostsRequest mockRequest = new ListPostsRequest();
+        mockRequest.setPage(1);
+        mockRequest.setPageSize(20);
+        mockRequest.setSort(PostSort.HOT);
+
+        Board mockBoard = new Board();
+        mockBoard.setBoardId(boardId);
+        mockBoard.setName("軟體版");
+        mockBoard.setDescription("聊軟體相關的知識");
+        mockBoard.setCreatedAt(Instant.now());
+
+        given(boardRepository.findById(boardId)).willReturn(Optional.of(mockBoard));
+
+        Pageable mockPageable = PageRequest.of(0, 20, Sort.by("hotScore").descending());
+        Page<PostItem> mockPage = new PageImpl<>(List.of(), mockPageable, 0);
+        given(postRepository.findByBoardId(eq(boardId),any(Pageable.class))).willReturn(mockPage);
+
+        // == When ==
+        ListPostsResponse response = postService.listPosts(boardId, mockRequest);
+
+        // == Then ==
+        ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
+        verify(postRepository).findByBoardId(eq(boardId), pageCaptor.capture());
+        Pageable capturedPageable = pageCaptor.getValue();
+        assertEquals(0,capturedPageable.getPageNumber());
+        assertEquals(20,capturedPageable.getPageSize());
+        assertEquals(Sort.by("p.hotScore").descending(),capturedPageable.getSort());
+        assertEquals(response.getItems().size(),0);
+
+        verify(boardRepository).findById(boardId);
+        verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
+
+    }
+
+    @Test
+    void listPosts_BoardNotFound_ThrowException() {
+        // == Given ==
+        long nonExistBoardId = 3L;
+        ListPostsRequest mockRequest = new ListPostsRequest();
+        mockRequest.setPage(1);
+        mockRequest.setPageSize(20);
+        mockRequest.setSort(PostSort.LATEST);
+
+        given(boardRepository.findById(nonExistBoardId)).willReturn(Optional.empty());
+
+        // == When ==
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            postService.listPosts(nonExistBoardId, mockRequest);
+        });
+
+        // == Then ==
+        assertEquals(ErrorMessage.NOT_FOUND, exception.getErrorMessage());
+        assertEquals(PostErrorCode.BOARD_NOT_FOUND, exception.getErrorCode());
+
+        // == Verify ==
+        verify(boardRepository).findById(nonExistBoardId);
+        verify(postRepository, never()).findByBoardId(anyLong(), any(Pageable.class));
     }
 }
