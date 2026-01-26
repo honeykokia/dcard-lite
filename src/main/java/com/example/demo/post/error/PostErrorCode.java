@@ -8,7 +8,9 @@ public enum PostErrorCode implements ErrorCode {
     SECURITY_UNAUTHORIZED,
     PATH_FORMAT_ERROR,
     BODY_INVALID,
-    TITLE_INVALID;
+    TITLE_INVALID,
+    PAGE_INVALID,
+    PAGE_SIZE_INVALID;
 
 
 
