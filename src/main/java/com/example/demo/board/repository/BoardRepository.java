@@ -11,4 +11,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findByNameContainingIgnoreCase(String keyword, Pageable pageable);
 
+    boolean existsById(Long boardId);
 }
