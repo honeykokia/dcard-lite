@@ -387,6 +387,152 @@ paths:
                     path: "/boards/2/posts"
                     timestamp: "2025-12-25T10:00:00Z"
 
+    get:
+      tags: [Boards]
+      summary: List posts in a specific board
+      operationId: listPosts
+      parameters:
+        - in: path
+          name: boardId
+          required: true
+          description: The ID of the board to list posts from
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 2
+        - in: query
+          name: page
+          required: false
+          description: Page number (default=1, must be >=1)
+          schema:
+            type: integer
+            format: int32
+            default: 1
+            minimum: 1
+          example: 1
+        - in: query
+          name: pageSize
+          required: false
+          description: Page size (default=40, 1..200)
+          schema:
+            type: integer
+            format: int32
+            default: 40
+            minimum: 1
+            maximum: 200
+          example: 40
+        - in: query
+          name: sort
+          required: false
+          description: Sorting criteria (default=latest)
+          schema:
+            type: string
+            enum: [latest, hot]
+            default: latest
+          example: latest
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListPostsResponse"
+              examples:
+                success:
+                  value:
+                    page: 1
+                    pageSize: 40
+                    total: 2
+                    items:
+                      - postId: 2
+                        authorId: 1
+                        authorName: "Leo"
+                        boardId: 2
+                        boardName: "軟體版"
+                        title: "關於Java問題"
+                        likeCount: 0
+                        hotScore: 0.0
+                        status: "ACTIVE"
+                        createdAt: "2026-01-01T12:00:00Z"
+                      - postId: 1
+                        authorId: 1
+                        authorName: "Leo"
+                        boardId: 2
+                        boardName: "軟體版"
+                        title: "關於SpringBoot問題"
+                        likeCount: 0
+                        hotScore: 0.0
+                        status: "ACTIVE"
+                        createdAt: "2025-12-25T10:00:00Z"
+                empty:
+                  value:
+                    page: 1
+                    pageSize: 40
+                    total: 0
+                    items: []
+        "400":
+          description: Bad Request (validation failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                pageInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PAGE_INVALID"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+                pageSizeInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PAGE_SIZE_INVALID"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+                sortInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PARAM_FORMAT_ERROR"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "404":
+          description: Not Found (board does not exist)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                boardNotFound:
+                  value:
+                    status: 404
+                    error: "Not Found"
+                    message: "NOT_FOUND"
+                    code: "BOARD_NOT_FOUND"
+                    path: "/boards/3/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                internalError:
+                  value:
+                    status: 500
+                    error: "Internal Server Error"
+                    message: "INTERNAL_ERROR"
+                    code: "UNEXPECTED_ERROR"
+                    path: "/boards/2/posts"
+                    timestamp: "2025-12-25T10:00:00Z"
+
 components:
   securitySchemes:
       bearerAuth:            # 這個名稱可以自訂，稍後套用時會用到
@@ -577,3 +723,67 @@ components:
           type: string
           format: date-time
           example: "2025-12-25T10:00:00Z"
+
+    ListPostsResponse:
+      type: object
+      required: [page, pageSize, total, items]
+      properties:
+        page:
+          type: integer
+          format: int32
+          example: 1
+        pageSize:
+          type: integer
+          format: int32
+          example: 40
+        total:
+          type: integer
+          format: int64
+          example: 2
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostItem"
+    PostItem:
+      type: object
+      required: [postId, authorId, authorName, boardId, boardName, title, likeCount, hotScore, status, createdAt]
+      properties:
+        postId:
+          type: integer
+          format: int64
+          example: 2
+        authorId:
+          type: integer
+          format: int64
+          example: 1
+        authorName:
+          type: string
+          maxLength: 20
+          example: "Leo"
+        boardId:
+          type: integer
+          format: int64
+          example: 1
+        boardName:
+          type: string
+          maxLength: 20
+          example: "八卦版"
+        title:
+          type: string
+          maxLength: 50
+          example: "關於Java問題"
+        likeCount:
+          type: integer
+          format: int32
+          example: 0
+        hotScore:
+          type: number
+          format: double
+          example: 0.0
+        status:
+          type: string
+          example: "ACTIVE"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-01-01T12:00:00Z"

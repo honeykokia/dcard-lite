@@ -12,8 +12,9 @@ import com.example.demo.common.security.JwtAuthenticationEntryPoint;
 import com.example.demo.common.security.JwtAuthenticationFilter;
 import com.example.demo.common.security.JwtService;
 import com.example.demo.common.security.SecurityConfig;
-import com.example.demo.post.dto.CreatePostRequest;
-import com.example.demo.post.dto.CreatePostResponse;
+import com.example.demo.post.dto.*;
+import com.example.demo.post.enums.PostSort;
+import com.example.demo.post.enums.PostStatus;
 import com.example.demo.post.error.PostErrorCode;
 import com.example.demo.post.service.PostService;
 import com.example.demo.user.entity.User;
@@ -35,6 +36,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -391,4 +394,166 @@ public class BoardControllerTest {
                 .andExpect(jsonPath("$.code").value(PostErrorCode.BOARD_NOT_FOUND.name())) // 2. 驗證錯誤代碼
                 .andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND.name()));   // 3. 驗證錯誤訊息
     }
+
+    @Test
+    void listPosts_Success() throws Exception {
+        // == Given ==
+        long boardId = 2L;
+
+        PostItem mockPostItem1 = new PostItem();
+        mockPostItem1.setPostId(2L);
+        mockPostItem1.setAuthorId(1L);
+        mockPostItem1.setAuthorName("Leo");
+        mockPostItem1.setBoardId(boardId);
+        mockPostItem1.setBoardName("軟體版");
+        mockPostItem1.setTitle("關於JAVA問題");
+        mockPostItem1.setLikeCount(0);
+        mockPostItem1.setHotScore(0.0);
+        mockPostItem1.setStatus(PostStatus.ACTIVE);
+        mockPostItem1.setCreatedAt(LocalDateTime.of(2026,1,1,10,0,0).toInstant(ZoneOffset.UTC));
+
+        PostItem mockPostItem2 = new PostItem();
+        mockPostItem2.setPostId(1L);
+        mockPostItem2.setAuthorId(1L);
+        mockPostItem2.setAuthorName("Leo");
+        mockPostItem2.setBoardId(boardId);
+        mockPostItem2.setBoardName("軟體版");
+        mockPostItem2.setTitle("關於SpringBoot的問題");
+        mockPostItem2.setLikeCount(0);
+        mockPostItem2.setHotScore(0.0);
+        mockPostItem2.setStatus(PostStatus.ACTIVE);
+        mockPostItem2.setCreatedAt(LocalDateTime.of(2025,12,25,10,0,0).toInstant(ZoneOffset.UTC));
+
+        ListPostsResponse mockResponse = new ListPostsResponse();
+        mockResponse.setItems(List.of(mockPostItem1, mockPostItem2));
+        mockResponse.setTotal(2L);
+        mockResponse.setPage(1);
+        mockResponse.setPageSize(40);
+
+        given(postService.listPosts(eq(boardId), any(ListPostsRequest.class)))
+                .willReturn(mockResponse);
+
+        // == When ==
+        ResultActions result = mockMvc.perform(get("/boards/{boardId}/posts", boardId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // == Then ==
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.pageSize").value(40))
+                .andExpect(jsonPath("$.total").value(2))
+                .andExpect(jsonPath("$.items[0].postId").value(2L))
+                .andExpect(jsonPath("$.items[0].title").value("關於JAVA問題"))
+                .andExpect(jsonPath("$.items[1].postId").value(1L))
+                .andExpect(jsonPath("$.items[1].title").value("關於SpringBoot的問題"));
+
+        ArgumentCaptor<ListPostsRequest> captor = ArgumentCaptor.forClass(ListPostsRequest.class);
+        verify(postService).listPosts(eq(boardId), captor.capture());
+
+        ListPostsRequest actualRequest = captor.getValue();
+
+        assertEquals(actualRequest.getPage(), 1);
+        assertEquals(actualRequest.getPageSize(), 40);
+        assertEquals(actualRequest.getSort(), PostSort.LATEST);
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "abc",
+            "-1",
+    })
+    void listPosts_PathInvalid_Return400(String boardId_Input) throws Exception {
+        // == Given ==
+        String invalidBoardId = boardId_Input;
+
+        // == When ==
+        ResultActions result = mockMvc.perform(get("/boards/{boardId}/posts", invalidBoardId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // == Then ==
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(PostErrorCode.PATH_FORMAT_ERROR.name()))
+                .andExpect(jsonPath("$.message").value(ErrorMessage.VALIDATION_FAILED.name()));
+    }
+
+    @ParameterizedTest(name = "測試案例: page={0}, 預期錯誤={1}")
+    @CsvSource({
+            "-1,             PAGE_INVALID",
+            "invalid,        PARAM_FORMAT_ERROR"
+    })
+    void listPosts_PageInvalid_Return400(String page, String expectedErrorCode) throws Exception {
+        // == When ==
+        ResultActions result = mockMvc.perform(get("/boards/{boardId}/posts", 1L)
+                .param("page", page) // Invalid page
+                .param("pageSize", "20")
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // == Then ==
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ErrorMessage.VALIDATION_FAILED.name()))
+                .andExpect(jsonPath("$.code").value(expectedErrorCode));
+
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "-1,      PAGE_SIZE_INVALID",
+            "201,    PAGE_SIZE_INVALID",
+            "invalid, PARAM_FORMAT_ERROR"
+    })
+    void listPosts_PageSizeInvalid_Return400(String pageSize, String expectedErrorCode) throws Exception {
+
+        // == When ==
+        ResultActions result = mockMvc.perform(get("/boards/{boardId}/posts", 1L)
+                .param("page", "1") // Valid page (fixed), testing pageSize validation
+                .param("pageSize", pageSize)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // == Then ==
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ErrorMessage.VALIDATION_FAILED.name()))
+                .andExpect(jsonPath("$.code").value(expectedErrorCode));
+
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "INVALID_SORT,    PARAM_FORMAT_ERROR",
+            "1,               PARAM_FORMAT_ERROR"
+    })
+    void listPosts_SortInvalid_Return400(String sortInput, String expectedErrorCode) throws Exception {
+        // == When ==
+        ResultActions result = mockMvc.perform(get("/boards/{boardId}/posts", 1L)
+                .param("page", "1")
+                .param("pageSize", "20")
+                .param("sort", sortInput)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // == Then ==
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ErrorMessage.VALIDATION_FAILED.name()))
+                .andExpect(jsonPath("$.code").value(expectedErrorCode));
+    }
+
+    @Test
+    void listPosts_BoardNotFound_Return404() throws Exception {
+        // == Given ==
+        long  nonExistBoardId = 3;
+
+        given(postService.listPosts(eq(nonExistBoardId), any(ListPostsRequest.class)))
+                .willThrow(new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.BOARD_NOT_FOUND));
+
+        // == When ==
+        ResultActions result = mockMvc.perform(get("/boards/{boardId}/posts", nonExistBoardId)
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // == Then ==
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value(PostErrorCode.BOARD_NOT_FOUND.name()))
+                .andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND.name()));
+
+    }
+
 }

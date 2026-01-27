@@ -4,13 +4,17 @@ import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
-import com.example.demo.post.dto.CreatePostRequest;
-import com.example.demo.post.dto.CreatePostResponse;
+import com.example.demo.post.dto.*;
 import com.example.demo.post.entity.Post;
+import com.example.demo.post.enums.PostSort;
 import com.example.demo.post.error.PostErrorCode;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +58,46 @@ public class PostService {
         // 返回 Response
         CreatePostResponse response = new CreatePostResponse();
         response.setPostId(savedPost.getPostId());
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public ListPostsResponse listPosts(long boardId, ListPostsRequest request) {
+
+        boolean boardExists = boardRepository.existsById(boardId);
+        if (!boardExists){
+            throw new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.BOARD_NOT_FOUND);
+        }
+
+        // 1-based -> 0-based page index
+        int page = Math.max(0, request.getPage() - 1);
+        int pageSize = request.getPageSize();
+        PostSort postSort = request.getSort();
+
+
+        Sort sort;
+        switch (postSort) {
+            case LATEST:
+                sort = Sort.by("createdAt").descending();
+                break;
+            case HOT:
+                sort = Sort.by("hotScore").descending();
+                break;
+            default:
+                sort = Sort.by("createdAt").descending();
+        }
+
+
+        Pageable pageable = PageRequest.of(page, pageSize, sort);
+
+        // 取得分頁內容
+        Page<PostItem> pageResult = postRepository.findByBoardId(boardId, pageable);
+
+        ListPostsResponse response = new ListPostsResponse();
+        response.setPage(pageResult.getNumber() + 1);
+        response.setPageSize(pageResult.getSize());
+        response.setTotal(pageResult.getTotalElements());
+        response.setItems(pageResult.getContent());
         return response;
     }
 }

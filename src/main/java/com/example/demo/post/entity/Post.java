@@ -1,6 +1,7 @@
 package com.example.demo.post.entity;
 
 import com.example.demo.board.entity.Board;
+import com.example.demo.post.enums.PostStatus;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,14 +9,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "posts")
+@Table(
+    name = "posts",
+    indexes = {
+        @Index(name = "idx_posts_board_created", columnList = "board_id, created_at"),
+        @Index(name = "idx_posts_board_hot", columnList = "board_id, hot_score")
+    }
+)
 public class Post {
 
     @Id
@@ -46,23 +53,24 @@ public class Post {
     @Column(name = "hot_score", nullable = false)
     private Double hotScore = 0.0;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20, nullable = false)
-    private String status = "ACTIVE";
+    private PostStatus status = PostStatus.ACTIVE;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = Instant.now();
     }
 }

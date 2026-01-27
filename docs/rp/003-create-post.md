@@ -128,8 +128,9 @@
     - `INTERNAL_ERROR`
         - `UNEXPECTED_ERROR`
 
-## Internal Design (Service & Repository)
-### Use Case: createPost
+## Service Logic
+### `PostService`
+#### Use Case: createPost
 - **Method Signature**
 ```java
 CreatePostResponse createPost(long boardId, long userId, CreatePostRequest request);
@@ -147,16 +148,16 @@ CreatePostResponse createPost(long boardId, long userId, CreatePostRequest reque
 - **Return Model**
     - `response` (CreatePostResponse)
         - postId(long)
-### Data Access
-#### `PostRepository`
+## Data Access
+### `PostRepository`
 ```java
 save(Post post);
 ```
-#### `BoardRepository`
+### `BoardRepository`
 ```java
 findById(long boardId);
 ```
-#### UserRepository
+### `UserRepository`
 ```java
 findById(long userId);
 ```

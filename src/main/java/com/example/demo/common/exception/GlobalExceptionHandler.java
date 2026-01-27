@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("PATH_FORMAT_ERROR", request);
     }
 
-    // 4. 處理「違反驗證規則」的錯誤 (例如：@Min, @NotBlank 在 PathVariable 上失效)
+    // 4. 如果加上@Validate 處理「違反驗證規則」的錯誤會進到這 (例如：@Min, @NotBlank 在 PathVariable 上失效)
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolation(
             ConstraintViolationException ex, HttpServletRequest request) {
