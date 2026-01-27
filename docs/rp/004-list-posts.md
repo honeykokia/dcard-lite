@@ -73,7 +73,7 @@
 }
 ```
 
-## Error Mapping ( Domian → HTTP )
+## Error Mapping ( Domain → HTTP )
 - **400 Bad Request**
     - `message` : `VALIDATION_FAILED`
     - `code` :
@@ -173,7 +173,7 @@ ListPostsResponse listPosts(long boardId, ListPostsRequest request);
 ```
 - **Transaction**
     - `@Transactional(readOnly = true)` (優化讀取效能)
-- **Input Model
+- **Input Model**
     - `boardId` (Long)
         - 來源: PathVariable (`/boards/{boardId}`)
     - `request` (ListPostsRequest)
