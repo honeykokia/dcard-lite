@@ -448,8 +448,8 @@ paths:
                       - postId: 2
                         authorId: 1
                         authorName: "Leo"
-                        boardId: 1
-                        boardName: "八卦版"
+                        boardId: 2
+                        boardName: "軟體版"
                         title: "關於Java問題"
                         likeCount: 0
                         hotScore: 0.0
@@ -458,8 +458,8 @@ paths:
                       - postId: 1
                         authorId: 1
                         authorName: "Leo"
-                        boardId: 1
-                        boardName: "八卦版"
+                        boardId: 2
+                        boardName: "軟體版"
                         title: "關於SpringBoot問題"
                         likeCount: 0
                         hotScore: 0.0
