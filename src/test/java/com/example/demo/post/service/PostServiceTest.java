@@ -199,7 +199,7 @@ public class PostServiceTest {
 
         Pageable mockPageable = PageRequest.of(0, 40, Sort.by("createdAt").descending());
         Page<PostItem> mockPage = new PageImpl<>(List.of(postItem1, postItem2), mockPageable, 2);
-        given(boardRepository.findById(boardId)).willReturn(Optional.of(mockBoard));
+        given(boardRepository.existsById(boardId)).willReturn(true);
         given(postRepository.findByBoardId(eq(boardId),any(Pageable.class))).willReturn(mockPage);
 
         // == When ==
@@ -211,16 +211,16 @@ public class PostServiceTest {
         Pageable capturedPageable = pageCaptor.getValue();
         assertEquals(0,capturedPageable.getPageNumber());
         assertEquals(40,capturedPageable.getPageSize());
-        assertEquals(Sort.by("p.createdAt").descending(),capturedPageable.getSort());
+        assertEquals(Sort.by("createdAt").descending(),capturedPageable.getSort());
         assertEquals(response.getItems().size(),2);
 
-        verify(boardRepository).findById(boardId);
+        verify(boardRepository).existsById(boardId);
         verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
 
     }
 
     @Test
-    void lisPosts_HotSort_Success() {
+    void listPosts_HotSort_Success() {
         // == Given ==
         long boardId = 2L;
 
@@ -235,7 +235,7 @@ public class PostServiceTest {
         mockBoard.setDescription("聊軟體相關的知識");
         mockBoard.setCreatedAt(Instant.now());
 
-        given(boardRepository.findById(boardId)).willReturn(Optional.of(mockBoard));
+        given(boardRepository.existsById(boardId)).willReturn(true);
 
         Pageable mockPageable = PageRequest.of(0, 20, Sort.by("hotScore").descending());
         Page<PostItem> mockPage = new PageImpl<>(List.of(), mockPageable, 0);
@@ -250,10 +250,10 @@ public class PostServiceTest {
         Pageable capturedPageable = pageCaptor.getValue();
         assertEquals(0,capturedPageable.getPageNumber());
         assertEquals(20,capturedPageable.getPageSize());
-        assertEquals(Sort.by("p.hotScore").descending(),capturedPageable.getSort());
+        assertEquals(Sort.by("hotScore").descending(),capturedPageable.getSort());
         assertEquals(response.getItems().size(),0);
 
-        verify(boardRepository).findById(boardId);
+        verify(boardRepository).existsById(boardId);
         verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
 
     }
@@ -267,7 +267,7 @@ public class PostServiceTest {
         mockRequest.setPageSize(20);
         mockRequest.setSort(PostSort.LATEST);
 
-        given(boardRepository.findById(nonExistBoardId)).willReturn(Optional.empty());
+        given(boardRepository.existsById(nonExistBoardId)).willReturn(false);
 
         // == When ==
         ApiException exception = assertThrows(ApiException.class, () -> {
@@ -279,7 +279,7 @@ public class PostServiceTest {
         assertEquals(PostErrorCode.BOARD_NOT_FOUND, exception.getErrorCode());
 
         // == Verify ==
-        verify(boardRepository).findById(nonExistBoardId);
+        verify(boardRepository).existsById(nonExistBoardId);
         verify(postRepository, never()).findByBoardId(anyLong(), any(Pageable.class));
     }
 }
