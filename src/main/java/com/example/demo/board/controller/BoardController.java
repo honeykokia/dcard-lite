@@ -37,10 +37,10 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}/posts")
-    public ResponseEntity<?> listPosts(
+    public ResponseEntity<ListPostsResponse> listPosts(
             @PathVariable @Positive(message = "PATH_FORMAT_ERROR") Long boardId,
             @Valid @ModelAttribute ListPostsRequest request) {
-        ListPostsResponse response = postService.listPosts(boardId,  request);
+        ListPostsResponse response = postService.listPosts(boardId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
