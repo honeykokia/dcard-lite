@@ -10,7 +10,8 @@ public enum PostErrorCode implements ErrorCode {
     BODY_INVALID,
     TITLE_INVALID,
     PAGE_INVALID,
-    PAGE_SIZE_INVALID;
+    PAGE_SIZE_INVALID,
+    SORT_INVALID;
 
 
 
