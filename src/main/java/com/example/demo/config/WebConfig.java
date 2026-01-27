@@ -14,8 +14,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new Converter<String, PostSort>() {
             @Override
             public PostSort convert(String source) {
-                // 1. 如果是空字串，回傳 null (讓 DTO 預設值生效) 或直接回傳 LATEST
-                if (source.isEmpty()) {
+                // 1. 如果是 null 或空字串，回傳 LATEST 做為預設值
+                if (source == null || source.isEmpty()) {
                     return PostSort.LATEST;
                 }
                 // 2. 轉大寫後比對
