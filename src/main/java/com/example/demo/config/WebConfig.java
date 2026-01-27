@@ -22,8 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
                 try {
                     return PostSort.valueOf(source.toUpperCase());
                 } catch (IllegalArgumentException e) {
-                    // 3. 如果亂打 (例如 sort=abc)，這裡決定要報錯還是給預設值
-                    // 回傳 LATEST 代表容錯；拋出錯誤代表嚴格檢查
+                    // 3. 如果亂打 (例如 sort=abc)拋出錯誤
                     throw e;
                 }
             }
