@@ -4,27 +4,19 @@ import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
-import com.example.demo.post.dto.CreatePostRequest;
-import com.example.demo.post.dto.CreatePostResponse;
-import com.example.demo.post.dto.ListPostsRequest;
-import com.example.demo.post.dto.ListPostsResponse;
-import com.example.demo.post.dto.PostItem;
+import com.example.demo.post.dto.*;
 import com.example.demo.post.entity.Post;
 import com.example.demo.post.enums.PostSort;
 import com.example.demo.post.error.PostErrorCode;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.entity.User;
 import com.example.demo.user.repository.UserRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
-import java.util.List;
-import java.util.Comparator;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PostService {
@@ -72,8 +64,10 @@ public class PostService {
     @Transactional(readOnly = true)
     public ListPostsResponse listPosts(long boardId, ListPostsRequest request) {
 
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.BOARD_NOT_FOUND));
+        boolean boardExists = boardRepository.existsById(boardId);
+        if (!boardExists){
+            throw new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.BOARD_NOT_FOUND);
+        }
 
         // 1-based -> 0-based page index
         int page = Math.max(0, request.getPage() - 1);
@@ -84,13 +78,13 @@ public class PostService {
         Sort sort;
         switch (postSort) {
             case LATEST:
-                sort = Sort.by("p.createdAt").descending();
+                sort = Sort.by("createdAt").descending();
                 break;
             case HOT:
-                sort = Sort.by("p.hotScore").descending();
+                sort = Sort.by("hotScore").descending();
                 break;
             default:
-                sort = Sort.by("p.createdAt").descending();
+                sort = Sort.by("createdAt").descending();
         }
 
 
