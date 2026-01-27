@@ -99,7 +99,7 @@
     - `code` :
         - `BOARD_NOT_FOUND`
             - 請求的boardId 資料庫並不存在該看板
-- **500 Internal Server Erro**
+- **500 Internal Server Error**
     - `message` : `INTERNAL_ERROR`
     - `code` :
         - `UNEXPECTED_ERROR`
@@ -131,7 +131,7 @@
 			"boardName":"軟體版",
 			"title": "關於Java問題",
 			"likeCount": 0,
-			"hot_score": 0.0,
+			"hotScore": 0.0,
 			"status": "ACTIVE",
 			"createdAt": "2026-01-01 12:00:00"
 		},
@@ -143,7 +143,7 @@
 			"boardName":"軟體版",
 			"title": "關於SpringBoot問題",
 			"likeCount": 0,
-			"hot_score": 0.0,
+			"hotScore": 0.0,
 			"status": "ACTIVE",
 			"createdAt": "2025-12-25 10:00:00"
 		}
@@ -154,7 +154,7 @@
 
 #### Response (Error)
 - **400 Bad Request**
-    - `VALIDATION_FAILDE`
+    - `VALIDATION_FAILED`
         - `PATH_FORMAT_ERROR`
         - `PAGE_INVALID`
         - `PARAM_FORMAT_ERROR`
