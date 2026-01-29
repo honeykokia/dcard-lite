@@ -11,7 +11,8 @@ public enum PostErrorCode implements ErrorCode {
     TITLE_INVALID,
     PAGE_INVALID,
     PAGE_SIZE_INVALID,
-    SORT_INVALID;
+    SORT_INVALID,
+    POST_NOT_FOUND;
 
 
 
