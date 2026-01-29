@@ -2,11 +2,15 @@ package com.example.demo.post.repository;
 
 import com.example.demo.post.dto.PostItem;
 import com.example.demo.post.entity.Post;
+import com.example.demo.post.enums.PostStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -25,5 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "FROM Post p WHERE p.board.boardId = :boardId")
     Page<PostItem> findByBoardId(Long boardId, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"author", "board"})
+    Optional<Post> findByPostIdAndStatus(Long postId, PostStatus status);
 }
 
