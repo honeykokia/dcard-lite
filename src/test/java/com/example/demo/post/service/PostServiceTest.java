@@ -1,5 +1,6 @@
 package com.example.demo.post.service;
 
+import com.example.demo.board.dto.GetPostResponse;
 import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
 import com.example.demo.common.error.ErrorMessage;
@@ -282,4 +283,71 @@ public class PostServiceTest {
         verify(boardRepository).existsById(nonExistBoardId);
         verify(postRepository, never()).findByBoardId(anyLong(), any(Pageable.class));
     }
+
+    @Test
+    void getPost_Success(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockUser = new User();
+        mockUser.setUserId(1L);
+        mockUser.setDisplayName("Leo");
+        mockUser.setRole(UserRole.USER);
+
+        Board mockBoard = new Board();
+        mockBoard.setBoardId(2L);
+        mockBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockBoard);
+        mockPost.setAuthor(mockUser);
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        given(postRepository.findByPostIdAndStatus(postId,PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        GetPostResponse response = postService.getPost(postId);
+
+        // == Then ==
+        assertEquals(response.getPostId(),mockPost.getPostId());
+        assertEquals(response.getBoardId(),mockBoard.getBoardId());
+        assertEquals(response.getBoardName(),mockBoard.getName());
+        assertEquals(response.getAuthorId(),mockUser.getUserId());
+        assertEquals(response.getAuthorName(),mockUser.getDisplayName());
+        assertEquals(response.getTitle(),mockPost.getTitle());
+        assertEquals(response.getBody(),mockPost.getBody());
+        assertEquals(response.getLikeCount(),mockPost.getLikeCount());
+        assertEquals(response.getCommentCount(),mockPost.getCommentCount());
+        assertEquals(response.getStatus(),mockPost.getStatus());
+
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+    }
+
+    @Test
+    void getPost_PostNotFoundOrDeleted_ThrowException() {
+        // == Given ==
+        long targetPostId = 99L;
+
+        given(postRepository.findByPostIdAndStatus(targetPostId, PostStatus.ACTIVE))
+                .willReturn(Optional.empty());
+
+        // == When ==
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            postService.getPost(targetPostId);
+        });
+
+        // == Then ==
+        assertEquals(ErrorMessage.NOT_FOUND, exception.getErrorMessage());
+        assertEquals(PostErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+
+        // == Verify ==
+        verify(postRepository).findByPostIdAndStatus(targetPostId, PostStatus.ACTIVE);
+    }
+
 }
