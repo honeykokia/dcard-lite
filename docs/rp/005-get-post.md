@@ -46,7 +46,7 @@
 ## Error Response Format
 > 本系統錯誤回應採固定格式：`message` 表示錯誤大類（如 `VALIDATION_FAILED` / `UNAUTHORIZED` / `CONFLICT` / `NOT_FOUND` / `INTERNAL_ERROR`），`code` 表示細項原因（如 `NAME_INVALID` / `EMAIL_ALREADY_EXISTS`）。
 
-```json  {  
+```json
 {
   "status": 400,
   "error": "Bad Request",
@@ -202,7 +202,7 @@ Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
         - `error` = "Bad Request"
         - `message` = "VALIDATION_FAILED"
         - `code` = "PATH_FORMAT_ERROR"
-        - `path` = "/boards/{postId_input}/posts"
+        - `path` = "/posts/{postId_input}/posts"
         - `timestamp` = "..."
 ##### 文章不存在
 - Given :
