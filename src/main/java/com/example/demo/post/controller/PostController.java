@@ -1,6 +1,6 @@
 package com.example.demo.post.controller;
 
-import com.example.demo.board.dto.GetPostResponse;
+import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.post.service.PostService;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/{postId}")
-    public ResponseEntity<GetPostResponse> getPost(@Positive(message = "PATH_FORMAT_ERROR") @PathVariable Integer postId) {
+    public ResponseEntity<GetPostResponse> getPost(@Positive(message = "PATH_FORMAT_ERROR") @PathVariable Long postId) {
         GetPostResponse response = postService.getPost(postId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
