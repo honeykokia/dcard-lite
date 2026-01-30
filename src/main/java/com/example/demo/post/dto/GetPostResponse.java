@@ -1,6 +1,5 @@
-package com.example.demo.board.dto;
+package com.example.demo.post.dto;
 
-import com.example.demo.post.enums.PostStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +21,6 @@ public class GetPostResponse {
     private String body;
     private int likeCount;
     private int commentCount;
-    private PostStatus status;
     private Instant createdAt;
 
 }
