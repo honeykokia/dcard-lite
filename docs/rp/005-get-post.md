@@ -71,7 +71,7 @@
     - `code` :
         - `POST_NOT_FOUND`
             - 請求的postId 資料庫並不存在該文章
-            - 該文章status為 `DELETE`
+            - 該文章status為 `DELETED`
 ## API Contract
 ### `GET /posts/{postId}`
 #### Request
@@ -134,7 +134,7 @@ GetPostResponse getPost(long postId);
 ### `PostRepository`
 ```java
 @EntityGraph(attributePaths = {"author", "board"})
-Optional<Post> findByIdAndStatus(long postId, PostStatus status);
+Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
 ```
 
 ## Test
