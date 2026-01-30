@@ -74,7 +74,7 @@ public class PostControllerTest {
         given(postService.getPost(postId)).willReturn(mockResponse);
 
         // == When ==
-        ResultActions result= mockMvc.perform(get("/posts/{postId}", postId)
+        ResultActions result = mockMvc.perform(get("/posts/{postId}", postId)
                         .contentType(MediaType.APPLICATION_JSON));
 
 
