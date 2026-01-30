@@ -1,5 +1,6 @@
 package com.example.demo.post.service;
 
+import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
 import com.example.demo.common.error.ErrorMessage;
@@ -7,6 +8,7 @@ import com.example.demo.common.exception.ApiException;
 import com.example.demo.post.dto.*;
 import com.example.demo.post.entity.Post;
 import com.example.demo.post.enums.PostSort;
+import com.example.demo.post.enums.PostStatus;
 import com.example.demo.post.error.PostErrorCode;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.entity.User;
@@ -98,6 +100,27 @@ public class PostService {
         response.setPageSize(pageResult.getSize());
         response.setTotal(pageResult.getTotalElements());
         response.setItems(pageResult.getContent());
+        return response;
+    }
+
+    @Transactional(readOnly = true)
+    public GetPostResponse getPost(long postId) {
+        // 查詢狀態為 ACTIVE 的文章
+        Post post = postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)
+                .orElseThrow(() -> new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.POST_NOT_FOUND));
+
+        // 構建回應
+        GetPostResponse response = new GetPostResponse();
+        response.setPostId(post.getPostId());
+        response.setBoardId(post.getBoard().getBoardId());
+        response.setBoardName(post.getBoard().getName());
+        response.setAuthorId(post.getAuthor().getUserId());
+        response.setAuthorName(post.getAuthor().getDisplayName());
+        response.setTitle(post.getTitle());
+        response.setBody(post.getBody());
+        response.setLikeCount(post.getLikeCount());
+        response.setCommentCount(post.getCommentCount());
+        response.setCreatedAt(post.getCreatedAt());
         return response;
     }
 }
