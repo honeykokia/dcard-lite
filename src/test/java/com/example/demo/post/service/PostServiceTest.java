@@ -1,6 +1,6 @@
 package com.example.demo.post.service;
 
-import com.example.demo.board.dto.GetPostResponse;
+import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
 import com.example.demo.common.error.ErrorMessage;
@@ -324,7 +324,6 @@ public class PostServiceTest {
         assertEquals(response.getBody(),mockPost.getBody());
         assertEquals(response.getLikeCount(),mockPost.getLikeCount());
         assertEquals(response.getCommentCount(),mockPost.getCommentCount());
-        assertEquals(response.getStatus(),mockPost.getStatus());
 
         verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
     }

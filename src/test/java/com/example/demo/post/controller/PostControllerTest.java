@@ -1,6 +1,6 @@
 package com.example.demo.post.controller;
 
-import com.example.demo.board.dto.GetPostResponse;
+import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
 import com.example.demo.common.exception.GlobalExceptionHandler;
@@ -13,7 +13,6 @@ import com.example.demo.post.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
