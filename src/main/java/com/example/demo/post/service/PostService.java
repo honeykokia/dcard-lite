@@ -1,6 +1,6 @@
 package com.example.demo.post.service;
 
-import com.example.demo.board.dto.GetPostResponse;
+import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
 import com.example.demo.common.error.ErrorMessage;
@@ -120,7 +120,6 @@ public class PostService {
         response.setBody(post.getBody());
         response.setLikeCount(post.getLikeCount());
         response.setCommentCount(post.getCommentCount());
-        response.setStatus(post.getStatus());
         response.setCreatedAt(post.getCreatedAt());
         return response;
     }
