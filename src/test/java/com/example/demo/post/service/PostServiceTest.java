@@ -201,14 +201,14 @@ public class PostServiceTest {
         Pageable mockPageable = PageRequest.of(0, 40, Sort.by("createdAt").descending());
         Page<PostItem> mockPage = new PageImpl<>(List.of(postItem1, postItem2), mockPageable, 2);
         given(boardRepository.existsById(boardId)).willReturn(true);
-        given(postRepository.findByBoardId(eq(boardId),any(Pageable.class))).willReturn(mockPage);
+        given(postRepository.findByBoardId(eq(boardId),eq(PostStatus.ACTIVE), any(Pageable.class))).willReturn(mockPage);
 
         // == When ==
         ListPostsResponse response = postService.listPosts(boardId, mockRequest);
 
         // == Then ==
         ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(postRepository).findByBoardId(eq(boardId), pageCaptor.capture());
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), pageCaptor.capture());
         Pageable capturedPageable = pageCaptor.getValue();
         assertEquals(0,capturedPageable.getPageNumber());
         assertEquals(40,capturedPageable.getPageSize());
@@ -216,7 +216,7 @@ public class PostServiceTest {
         assertEquals(response.getItems().size(),2);
 
         verify(boardRepository).existsById(boardId);
-        verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), any(Pageable.class));
 
     }
 
@@ -240,14 +240,14 @@ public class PostServiceTest {
 
         Pageable mockPageable = PageRequest.of(0, 20, Sort.by("hotScore").descending());
         Page<PostItem> mockPage = new PageImpl<>(List.of(), mockPageable, 0);
-        given(postRepository.findByBoardId(eq(boardId),any(Pageable.class))).willReturn(mockPage);
+        given(postRepository.findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), any(Pageable.class))).willReturn(mockPage);
 
         // == When ==
         ListPostsResponse response = postService.listPosts(boardId, mockRequest);
 
         // == Then ==
         ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(postRepository).findByBoardId(eq(boardId), pageCaptor.capture());
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), pageCaptor.capture());
         Pageable capturedPageable = pageCaptor.getValue();
         assertEquals(0,capturedPageable.getPageNumber());
         assertEquals(20,capturedPageable.getPageSize());
@@ -255,7 +255,7 @@ public class PostServiceTest {
         assertEquals(response.getItems().size(),0);
 
         verify(boardRepository).existsById(boardId);
-        verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), any(Pageable.class));
 
     }
 
@@ -281,7 +281,7 @@ public class PostServiceTest {
 
         // == Verify ==
         verify(boardRepository).existsById(nonExistBoardId);
-        verify(postRepository, never()).findByBoardId(anyLong(), any(Pageable.class));
+        verify(postRepository, never()).findByBoardId(anyLong(), any(PostStatus.class), any(Pageable.class));
     }
 
     @Test
@@ -371,7 +371,7 @@ public class PostServiceTest {
         mockPost.setBody("請問如何創建專案?");
         mockPost.setLikeCount(0);
         mockPost.setCommentCount(0);
-        mockPost.setStatus(PostStatus.DELETED);
+        mockPost.setStatus(PostStatus.ACTIVE);
         mockPost.setCreatedAt(Instant.now());
 
         given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
