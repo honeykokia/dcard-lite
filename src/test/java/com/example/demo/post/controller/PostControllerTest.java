@@ -1,7 +1,5 @@
 package com.example.demo.post.controller;
 
-import com.example.demo.post.dto.DeletePostResponse;
-import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
 import com.example.demo.common.exception.GlobalExceptionHandler;
@@ -9,6 +7,8 @@ import com.example.demo.common.security.JwtAuthenticationEntryPoint;
 import com.example.demo.common.security.JwtAuthenticationFilter;
 import com.example.demo.common.security.JwtService;
 import com.example.demo.common.security.SecurityConfig;
+import com.example.demo.post.dto.DeletePostResponse;
+import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.post.dto.UpdatePostRequest;
 import com.example.demo.post.dto.UpdatePostResponse;
 import com.example.demo.post.enums.PostStatus;
@@ -22,7 +22,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -35,7 +34,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.Instant;
 import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -156,7 +156,7 @@ public class PostControllerTest {
 
         DeletePostResponse mockResponse = DeletePostResponse.builder()
                 .postId(postId)
-                .postStatus(PostStatus.DELETED)
+                .status(PostStatus.DELETED)
                 .build();
 
         given(postService.deletePost(eq(postId), eq(mockUser)))
@@ -170,7 +170,7 @@ public class PostControllerTest {
         // == Then ==
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.postId").value(postId))
-                .andExpect(jsonPath("$.postStatus").value(PostStatus.DELETED.name()));
+                .andExpect(jsonPath("$.status").value(PostStatus.DELETED.name()));
 
         // == Verify ==
         verify(postService,times(1)).deletePost(eq(postId), eq(mockUser));
@@ -330,7 +330,7 @@ public class PostControllerTest {
 
         UpdatePostRequest mockRequest = new UpdatePostRequest();
         mockRequest.setTitle("更新後的標題");
-        mockRequest.setBody("請問如何創建專案?");
+        mockRequest.setBody(null);
 
         UpdatePostResponse mockResponse = new UpdatePostResponse();
         mockResponse.setPostId(postId);
