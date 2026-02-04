@@ -79,6 +79,9 @@
   - RP-001 設計：`/docs/rp/001-register-login.md`
   - RP-002 設計：`/docs/rp/002-listboard.md`
   - RP-003 設計： `/docs/rp/003-createpost.md`
+  - RP-004 設計： `/docs/rp/004-list-posts.md`
+  - RP-005 設計： `/docs/rp/005-get-post.md`
+  - RP-006 設計： `/docs/rp/006-update-delete-post.md`
 ---
 
 ## 3. 系統架構與流程
