@@ -37,20 +37,17 @@
 		- Purpose: 優化看板文章列表「熱門」排序
 
 ## Validation Rules
-- `authorId` (Path Parameter)
-	- 必填 (NOT NULL, NOT BLANK)
-	- 必須為正整數 (Integer > 0)
 - `postId` (Path Parameter)
 	- 必填 (NOT NULL, NOT BLANK)
 	- 必須為正整數 (Integer > 0)
 - `title` (RequestBody)
-	- optional
-	- 空白字串視為未提供
+	- optional (可不提供；若提供則須通過以下驗證)
+	- 不可為空字串或僅包含空白字元
 	- 最大長度: 50
 	- 簡單的XSS 防護不允許 `< >`
 - `body` (RequestBody)
-	- optional
-	- 空白字串視為未提供
+	- optional (可不提供；若提供則須通過以下驗證)
+    - 不可為空字串或僅包含空白字元
 	- 最大長度: 300
 	- 簡單的XSS 防護 允許換行（`\n`），但不允許 `< >`
 ## Error Response Format
@@ -68,7 +65,7 @@
 ```  
 ## Error Mapping ( Domain → HTTP )
 - **400 Bad Request**
-	- `message` : `VALIDATION_ERROR`
+	- `message` : `VALIDATION_FAILED`
 	- `code` :
 		- `PATH_FORMAT_ERROR`
 			- (postId or authorId) <=0
@@ -167,15 +164,15 @@
 #### Use Case: deletePost
 - **Method Signature**
 ```java
-DeletePostResponse deletePost(long postId, long userId);
+DeletePostResponse deletePost(long postId, User currentUser);
 ```
 - **Transaction**
 	- `@Transactional`
 - **Input Model**
 	- `postId` (long)
 		- 來源: PathVariable (`/posts/{postId}`)
-	- `userId` (long)
-		- 來源: AuthenticationPrincipal (從Security 取得 userId)
+	- `currentUser` (long)
+		- 來源: AuthenticationPrincipal (從Security 取得 user)
 - **Return Model**
 	- `DeletePostResponse`
 		- postId (long)
@@ -196,15 +193,15 @@ DeletePostResponse deletePost(long postId, long userId);
 #### Use Case: updatePost
 - **Method Signature**
 ```java
-UpdatePostResponse updatePost(long postId, long userId, UpdatePostRequest request);
+UpdatePostResponse updatePost(long postId, User currentUser, UpdatePostRequest request);
 ```
 - **Transaction**
 	- `@Transactional`
 - **Input Model**
 	- `postId` (long)
 		- 來源: `PathVariable` (/posts/{postId})
-	- `userId` (long)
-		- 來源: `AuthenticationPrincipal` (從Security 取得 userId)
+	- `currentUser` (long)
+		- 來源: AuthenticationPrincipal (從Security 取得 user)
 	- `request` (UpdatePostRequest)
 		- 來源: `RequestBody`
 		- `field`
@@ -279,7 +276,7 @@ Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
 ##### Path驗證失敗
 - Given
 	- userId = 1 (Mock User)
-	- **Secnario Inputs** (`postId_input`)
+	- **Scenario Inputs** (`postId_input`)
 		- 0
 		- -1
 		- abc
