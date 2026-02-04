@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DeletePostResponse {
     private long postId;
-    private PostStatus postStatus;
+    private PostStatus status;
 }
