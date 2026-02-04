@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -26,8 +27,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "p.hotScore, " +
             "p.status, " +
             "p.createdAt) " +
-            "FROM Post p WHERE p.board.boardId = :boardId AND p.status = 'ACTIVE'")
-    Page<PostItem> findByBoardId(Long boardId, Pageable pageable);
+            "FROM Post p WHERE p.board.boardId = :boardId AND p.status = :status")
+    Page<PostItem> findByBoardId(@Param("boardId") Long boardId, @Param("status") PostStatus status, Pageable pageable);
 
     @EntityGraph(attributePaths = {"author", "board"})
     Optional<Post> findByPostIdAndStatus(Long postId, PostStatus status);
