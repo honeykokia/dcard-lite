@@ -26,7 +26,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "p.hotScore, " +
             "p.status, " +
             "p.createdAt) " +
-            "FROM Post p WHERE p.board.boardId = :boardId")
+            "FROM Post p WHERE p.board.boardId = :boardId AND p.status = 'ACTIVE'")
     Page<PostItem> findByBoardId(Long boardId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"author", "board"})
