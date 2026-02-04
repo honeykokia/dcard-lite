@@ -209,7 +209,19 @@ ListPostsResponse listPosts(long boardId, ListPostsRequest request);
 ## Data Access
 ### `PostRepository`
 ```java
-Page<PostEntity> findByBoardId(Long boardId, Pageable pageable);
+@Query("SELECT new com.example.demo.post.dto.PostItem(" +
+    "p.postId, " +
+    "p.author.userId, " +
+    "p.author.displayName, " +
+    "p.board.boardId, " +
+    "p.board.name, " +
+    "p.title, " +
+    "p.likeCount, " +
+    "p.hotScore, " +
+    "p.status, " +
+    "p.createdAt) " +
+    "FROM Post p WHERE p.board.boardId = :boardId AND p.status = 'ACTIVE'")
+Page<PostItem> findByBoardId(Long boardId, Pageable pageable);
 ```
 ### `BoardRepository`
 ```java
