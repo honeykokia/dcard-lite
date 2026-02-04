@@ -220,8 +220,8 @@ ListPostsResponse listPosts(long boardId, ListPostsRequest request);
     "p.hotScore, " +
     "p.status, " +
     "p.createdAt) " +
-    "FROM Post p WHERE p.board.boardId = :boardId AND p.status = 'ACTIVE'")
-Page<PostItem> findByBoardId(Long boardId, Pageable pageable);
+    "FROM Post p WHERE p.board.boardId = :boardId AND p.status = :status")
+Page<PostItem> findByBoardId(Long boardId, PostStatus status, Pageable pageable);
 ```
 ### `BoardRepository`
 ```java
