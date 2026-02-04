@@ -97,7 +97,7 @@ public class PostService {
         Pageable pageable = PageRequest.of(page, pageSize, sort);
 
         // 取得分頁內容
-        Page<PostItem> pageResult = postRepository.findByBoardId(boardId, pageable);
+        Page<PostItem> pageResult = postRepository.findByBoardId(boardId, PostStatus.ACTIVE, pageable);
 
         ListPostsResponse response = new ListPostsResponse();
         response.setPage(pageResult.getNumber() + 1);
@@ -149,7 +149,7 @@ public class PostService {
         // 返回刪除成功的回應
         DeletePostResponse response = new DeletePostResponse();
         response.setPostId(postId);
-        response.setPostStatus(PostStatus.DELETED);
+        response.setStatus(PostStatus.DELETED);
         return response;
     }
 
