@@ -403,7 +403,7 @@ public class PostControllerTest {
                 Arguments.of("a".repeat(51)),
                 // 情境 5: 包含 < >
                 Arguments.of("<script>alert('hack')</script>"));
-    };
+    }
     @ParameterizedTest(name = "標題測試: title={0} 應回傳 400")
     @MethodSource("provideInvalidTitles")
     void updatePost_InvalidTitle_Return400(String invalidTitle) throws Exception {
@@ -438,7 +438,7 @@ public class PostControllerTest {
                 Arguments.of("a".repeat(301)),
                 // 情境 5: 包含 < >
                 Arguments.of("<script>alert('hack')</script>"));
-    };
+    }
     @ParameterizedTest(name = "內容測試: body={0} 應回傳 400")
     @MethodSource("provideInvalidBodies")
     void updatePost_InvalidBody_Return400(String invalidBody) throws Exception {
