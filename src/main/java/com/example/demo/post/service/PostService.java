@@ -175,8 +175,6 @@ public class PostService {
             post.setBody(request.getBody());
         }
 
-        post.setUpdatedAt(Instant.now());
-
         // 保存更新後的文章
         postRepository.save(post);
 
