@@ -68,11 +68,11 @@
 	- `message` : `VALIDATION_FAILED`
 	- `code` :
 		- `PATH_FORMAT_ERROR`
-			- (postId or authorId) <=0
-			- (postId or authorId) = null
-			- (postId or authorId) = "    "
-			- (postId or authorId) = ""
-			- (postId or authorId) = "Invalid Integer"
+			- postId <= 0
+			- postId = null
+			- postId = "    "
+			- postId = ""
+			- postId = "Invalid Integer"
 		- `TITLE_INVALID`
 			- title = ""
 			- title = "    "
