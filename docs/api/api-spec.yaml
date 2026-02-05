@@ -1114,12 +1114,12 @@ components:
       properties:
         title:
           type: string
-          description: Post title (validated after trim, no `<` or `>`)
+          description: Post title (must contain at least one non-whitespace character, no `<` or `>`)
           maxLength: 50
           example: "修改後的標題"
         body:
           type: string
-          description: Post body (validated after trim, allows `\n`, no `<` or `>`)
+          description: Post body (must contain at least one non-whitespace character, allows `\n`, no `<` or `>`)
           maxLength: 300
           example: "修改後的內容"
 
