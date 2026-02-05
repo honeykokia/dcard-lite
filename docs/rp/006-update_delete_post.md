@@ -217,7 +217,7 @@ UpdatePostResponse updatePost(long postId, User currentUser, UpdatePostRequest r
 		- 搜尋ACTIVE文章: 呼叫 `findByPostIdAndStatus(long postId, PostStatus status)`
 		- 若結果為空，拋出例外 `POST_NOT_FOUND`
 	- **STEP2**
-		- 檢查 `post.getAuthor().getId()` 是否等於 `userId`
+		- 檢查 `post.getAuthor().getId()` 是否等於 `currentUser.getId()`
 		- 若不一致，且使用者非`ADMIN`，拋出例外 `NOT_POST_AUTHOR`
 	- **STEP3**
 		- 進行文章標題或內容修改並儲存 `save()`
