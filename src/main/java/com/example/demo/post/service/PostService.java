@@ -1,5 +1,6 @@
 package com.example.demo.post.service;
 
+import com.example.demo.post.dto.DeletePostResponse;
 import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.board.entity.Board;
 import com.example.demo.board.repository.BoardRepository;
@@ -12,6 +13,7 @@ import com.example.demo.post.enums.PostStatus;
 import com.example.demo.post.error.PostErrorCode;
 import com.example.demo.post.repository.PostRepository;
 import com.example.demo.user.entity.User;
+import com.example.demo.user.entity.UserRole;
 import com.example.demo.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -93,7 +95,7 @@ public class PostService {
         Pageable pageable = PageRequest.of(page, pageSize, sort);
 
         // 取得分頁內容
-        Page<PostItem> pageResult = postRepository.findByBoardId(boardId, pageable);
+        Page<PostItem> pageResult = postRepository.findByBoardId(boardId, PostStatus.ACTIVE, pageable);
 
         ListPostsResponse response = new ListPostsResponse();
         response.setPage(pageResult.getNumber() + 1);
@@ -121,6 +123,64 @@ public class PostService {
         response.setLikeCount(post.getLikeCount());
         response.setCommentCount(post.getCommentCount());
         response.setCreatedAt(post.getCreatedAt());
+        return response;
+    }
+
+    @Transactional
+    public DeletePostResponse deletePost(long postId, User currentUser) {
+        // 查詢文章是否存在
+        Post post = postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)
+                .orElseThrow(() -> new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.POST_NOT_FOUND));
+
+        //判斷是否為作者本人或管理員
+        boolean isAuthor = post.getAuthor().getUserId() == currentUser.getUserId();
+        boolean isAdmin = currentUser.getRole() == UserRole.ADMIN;
+
+        if (!isAuthor && !isAdmin) {
+            throw new ApiException(ErrorMessage.FORBIDDEN, PostErrorCode.NOT_POST_AUTHOR);
+        }
+
+        // 更新文章狀態為 DELETED
+        post.setStatus(PostStatus.DELETED);
+        postRepository.save(post);
+
+        // 返回刪除成功的回應
+        DeletePostResponse response = new DeletePostResponse();
+        response.setPostId(postId);
+        response.setStatus(PostStatus.DELETED);
+        return response;
+    }
+
+    @Transactional
+    public UpdatePostResponse updatePost(long postId, User currentUser, UpdatePostRequest request) {
+        // 查詢文章是否存在
+        Post post = postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)
+                .orElseThrow(() -> new ApiException(ErrorMessage.NOT_FOUND, PostErrorCode.POST_NOT_FOUND));
+
+        //判斷是否為作者本人或管理員
+        boolean isAuthor = post.getAuthor().getUserId() == currentUser.getUserId();
+        boolean isAdmin = currentUser.getRole() == UserRole.ADMIN;
+
+        if (!isAuthor && !isAdmin) {
+            throw new ApiException(ErrorMessage.FORBIDDEN, PostErrorCode.NOT_POST_AUTHOR);
+        }
+
+        // 更新文章標題和內容（如果提供）
+        if (request.getTitle() != null) {
+            post.setTitle(request.getTitle());
+        }
+        if (request.getBody() != null) {
+            post.setBody(request.getBody());
+        }
+
+        // 保存更新後的文章
+        postRepository.save(post);
+
+        // 返回更新成功的回應
+        UpdatePostResponse response = new UpdatePostResponse();
+        response.setPostId(post.getPostId());
+        response.setTitle(post.getTitle());
+        response.setBody(post.getBody());
         return response;
     }
 }

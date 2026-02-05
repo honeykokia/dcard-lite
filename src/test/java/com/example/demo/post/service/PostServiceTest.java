@@ -201,14 +201,14 @@ public class PostServiceTest {
         Pageable mockPageable = PageRequest.of(0, 40, Sort.by("createdAt").descending());
         Page<PostItem> mockPage = new PageImpl<>(List.of(postItem1, postItem2), mockPageable, 2);
         given(boardRepository.existsById(boardId)).willReturn(true);
-        given(postRepository.findByBoardId(eq(boardId),any(Pageable.class))).willReturn(mockPage);
+        given(postRepository.findByBoardId(eq(boardId),eq(PostStatus.ACTIVE), any(Pageable.class))).willReturn(mockPage);
 
         // == When ==
         ListPostsResponse response = postService.listPosts(boardId, mockRequest);
 
         // == Then ==
         ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(postRepository).findByBoardId(eq(boardId), pageCaptor.capture());
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), pageCaptor.capture());
         Pageable capturedPageable = pageCaptor.getValue();
         assertEquals(0,capturedPageable.getPageNumber());
         assertEquals(40,capturedPageable.getPageSize());
@@ -216,7 +216,7 @@ public class PostServiceTest {
         assertEquals(response.getItems().size(),2);
 
         verify(boardRepository).existsById(boardId);
-        verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), any(Pageable.class));
 
     }
 
@@ -240,14 +240,14 @@ public class PostServiceTest {
 
         Pageable mockPageable = PageRequest.of(0, 20, Sort.by("hotScore").descending());
         Page<PostItem> mockPage = new PageImpl<>(List.of(), mockPageable, 0);
-        given(postRepository.findByBoardId(eq(boardId),any(Pageable.class))).willReturn(mockPage);
+        given(postRepository.findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), any(Pageable.class))).willReturn(mockPage);
 
         // == When ==
         ListPostsResponse response = postService.listPosts(boardId, mockRequest);
 
         // == Then ==
         ArgumentCaptor<Pageable> pageCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(postRepository).findByBoardId(eq(boardId), pageCaptor.capture());
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), pageCaptor.capture());
         Pageable capturedPageable = pageCaptor.getValue();
         assertEquals(0,capturedPageable.getPageNumber());
         assertEquals(20,capturedPageable.getPageSize());
@@ -255,7 +255,7 @@ public class PostServiceTest {
         assertEquals(response.getItems().size(),0);
 
         verify(boardRepository).existsById(boardId);
-        verify(postRepository).findByBoardId(eq(boardId),any(Pageable.class));
+        verify(postRepository).findByBoardId(eq(boardId), eq(PostStatus.ACTIVE), any(Pageable.class));
 
     }
 
@@ -281,7 +281,7 @@ public class PostServiceTest {
 
         // == Verify ==
         verify(boardRepository).existsById(nonExistBoardId);
-        verify(postRepository, never()).findByBoardId(anyLong(), any(Pageable.class));
+        verify(postRepository, never()).findByBoardId(anyLong(), any(PostStatus.class), any(Pageable.class));
     }
 
     @Test
@@ -349,4 +349,369 @@ public class PostServiceTest {
         verify(postRepository).findByPostIdAndStatus(targetPostId, PostStatus.ACTIVE);
     }
 
+    @Test
+    void deletePost_Success(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockPostUser = new User();
+        mockPostUser.setUserId(1L);
+        mockPostUser.setDisplayName("Leo");
+        mockPostUser.setRole(UserRole.USER);
+
+        Board mockPostBoard = new Board();
+        mockPostBoard.setBoardId(2L);
+        mockPostBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockPostBoard);
+        mockPost.setAuthor(mockPostUser);
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        postService.deletePost(postId, mockPostUser);
+
+        //== Then ==
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+        ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(postRepository).save(postCaptor.capture());
+        Post savedPost = postCaptor.getValue();
+        assertEquals(savedPost.getStatus(),PostStatus.DELETED);
+    }
+
+    @Test
+    void deletePost_NotPostAuthor_ThrowException(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockPostUser = new User();
+        mockPostUser.setUserId(1L);
+        mockPostUser.setDisplayName("Leo");
+        mockPostUser.setRole(UserRole.USER);
+
+        User mockCurrentUser = new User();
+        mockCurrentUser.setUserId(99L); // 非作者
+        mockCurrentUser.setDisplayName("NotLeo");
+        mockCurrentUser.setRole(UserRole.USER);
+
+        Board mockPostBoard = new Board();
+        mockPostBoard.setBoardId(2L);
+        mockPostBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockPostBoard);
+        mockPost.setAuthor(mockPostUser);
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            postService.deletePost(postId, mockCurrentUser); // 使用非作者的 userId
+        });
+
+        // == Then ==
+        assertEquals(ErrorMessage.FORBIDDEN, exception.getErrorMessage());
+        assertEquals(PostErrorCode.NOT_POST_AUTHOR, exception.getErrorCode());
+
+        // == Verify ==
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+        verify(postRepository, never()).save(any());
+    }
+
+    @Test
+    void deletePost_UserIsAdmin_Success(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockPostUser = new User();
+        mockPostUser.setUserId(1L);
+        mockPostUser.setDisplayName("Leo");
+        mockPostUser.setRole(UserRole.USER);
+
+        User mockCurrentUser = new User();
+        mockCurrentUser.setUserId(99L); // 非作者
+        mockCurrentUser.setDisplayName("Admin");
+        mockCurrentUser.setRole(UserRole.ADMIN);
+
+        Board mockPostBoard = new Board();
+        mockPostBoard.setBoardId(2L);
+        mockPostBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockPostBoard);
+        mockPost.setAuthor(mockPostUser); // 文章作者不是 Admin
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        postService.deletePost(postId, mockCurrentUser);
+
+        //== Then ==
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+        ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(postRepository).save(postCaptor.capture());
+        Post savedPost = postCaptor.getValue();
+        assertEquals(savedPost.getStatus(),PostStatus.DELETED);
+    }
+
+    @Test
+    void deletePost_PostNotFound_ThrowException(){
+        // == Given ==
+        long nonExistPostId = 99L;
+        User mockCurrentUser = new User();
+        mockCurrentUser.setUserId(1L);
+        mockCurrentUser.setDisplayName("Leo");
+        mockCurrentUser.setRole(UserRole.USER);
+
+        given(postRepository.findByPostIdAndStatus(nonExistPostId, PostStatus.ACTIVE)).willReturn(Optional.empty());
+
+        // == When ==
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            postService.deletePost(nonExistPostId, mockCurrentUser);
+        });
+
+        // == Then ==
+        assertEquals(ErrorMessage.NOT_FOUND, exception.getErrorMessage());
+        assertEquals(PostErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+
+        // == Verify ==
+        verify(postRepository).findByPostIdAndStatus(nonExistPostId, PostStatus.ACTIVE);
+        verify(postRepository, never()).save(any());
+    }
+
+    @Test
+    void updatePost_Success(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockPostUser = new User();
+        mockPostUser.setUserId(1L);
+        mockPostUser.setDisplayName("Leo");
+        mockPostUser.setRole(UserRole.USER);
+
+        Board mockPostBoard = new Board();
+        mockPostBoard.setBoardId(2L);
+        mockPostBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockPostBoard);
+        mockPost.setAuthor(mockPostUser);
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        UpdatePostRequest updateRequest = new UpdatePostRequest();
+        updateRequest.setTitle("更新後的標題");
+        updateRequest.setBody("更新後的內容");
+
+        given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        postService.updatePost(postId, mockPostUser, updateRequest);
+
+        //== Then ==
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+        ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(postRepository).save(postCaptor.capture());
+        Post savedPost = postCaptor.getValue();
+        assertEquals(savedPost.getTitle(),updateRequest.getTitle());
+        assertEquals(savedPost.getBody(),updateRequest.getBody());
+    }
+    @Test
+    void updatePost_OnlyUpdateTitle_Success(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockPostUser = new User();
+        mockPostUser.setUserId(1L);
+        mockPostUser.setDisplayName("Leo");
+        mockPostUser.setRole(UserRole.USER);
+
+        Board mockPostBoard = new Board();
+        mockPostBoard.setBoardId(2L);
+        mockPostBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockPostBoard);
+        mockPost.setAuthor(mockPostUser);
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        String expectedOriginalBody = "請問如何創建專案?";
+
+        UpdatePostRequest updateRequest = new UpdatePostRequest();
+        updateRequest.setTitle("更新後的標題");
+        updateRequest.setBody(null); // 只更新標題
+
+        given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        postService.updatePost(postId, mockPostUser, updateRequest);
+
+        //== Then ==
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+        ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(postRepository).save(postCaptor.capture());
+        Post savedPost = postCaptor.getValue();
+        assertEquals(savedPost.getTitle(),updateRequest.getTitle());
+        assertEquals(savedPost.getBody(),expectedOriginalBody); // 內容保持不變
+    }
+
+    @Test
+    void updatePost_UserIsAdmin_Success(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockPostUser = new User();
+        mockPostUser.setUserId(1L);
+        mockPostUser.setDisplayName("Leo");
+        mockPostUser.setRole(UserRole.USER);
+
+        User mockCurrentUser = new User();
+        mockCurrentUser.setUserId(99L); // 非作者
+        mockCurrentUser.setDisplayName("Admin");
+        mockCurrentUser.setRole(UserRole.ADMIN);
+
+        Board mockPostBoard = new Board();
+        mockPostBoard.setBoardId(2L);
+        mockPostBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockPostBoard);
+        mockPost.setAuthor(mockPostUser); // 文章作者不是 Admin
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        UpdatePostRequest updateRequest = new UpdatePostRequest();
+        updateRequest.setTitle("更新後的標題");
+        updateRequest.setBody("更新後的內容");
+
+        given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        postService.updatePost(postId, mockCurrentUser, updateRequest);
+
+        //== Then ==
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+        ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(postRepository).save(postCaptor.capture());
+        Post savedPost = postCaptor.getValue();
+        assertEquals(savedPost.getTitle(),updateRequest.getTitle());
+        assertEquals(savedPost.getBody(),updateRequest.getBody());
+    }
+
+    @Test
+    void updatePost_NotPostAuthor_ThrowException(){
+        // == Given ==
+        long postId = 1L;
+
+        User mockPostUser = new User();
+        mockPostUser.setUserId(1L);
+        mockPostUser.setDisplayName("Leo");
+        mockPostUser.setRole(UserRole.USER);
+
+        User mockCurrentUser = new User();
+        mockCurrentUser.setUserId(99L); // 非作者
+        mockCurrentUser.setDisplayName("NotLeo");
+        mockCurrentUser.setRole(UserRole.USER);
+
+        Board mockPostBoard = new Board();
+        mockPostBoard.setBoardId(2L);
+        mockPostBoard.setName("軟體版");
+
+        Post mockPost = new Post();
+        mockPost.setPostId(postId);
+        mockPost.setBoard(mockPostBoard);
+        mockPost.setAuthor(mockPostUser);
+        mockPost.setTitle("關於SpringBoot的問題");
+        mockPost.setBody("請問如何創建專案?");
+        mockPost.setLikeCount(0);
+        mockPost.setCommentCount(0);
+        mockPost.setStatus(PostStatus.ACTIVE);
+        mockPost.setCreatedAt(Instant.now());
+
+        UpdatePostRequest updateRequest = new UpdatePostRequest();
+        updateRequest.setTitle("更新後的標題");
+        updateRequest.setBody("更新後的內容");
+
+        given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
+
+        // == When ==
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            postService.updatePost(postId, mockCurrentUser, updateRequest); // 使用非作者的 userId
+        });
+
+        // == Then ==
+        assertEquals(ErrorMessage.FORBIDDEN, exception.getErrorMessage());
+        assertEquals(PostErrorCode.NOT_POST_AUTHOR, exception.getErrorCode());
+
+        // == Verify ==
+        verify(postRepository).findByPostIdAndStatus(postId,PostStatus.ACTIVE);
+        verify(postRepository, never()).save(any());
+    }
+
+    @Test
+    void updatePost_PostNotFound_ThrowException(){
+        // == Given ==
+        long nonExistPostId = 3L;
+        User mockCurrentUser = new User();
+        mockCurrentUser.setUserId(1L);
+        mockCurrentUser.setDisplayName("Leo");
+        mockCurrentUser.setRole(UserRole.USER);
+
+        UpdatePostRequest updateRequest = new UpdatePostRequest();
+        updateRequest.setTitle("更新後的標題");
+        updateRequest.setBody("更新後的內容");
+
+        given(postRepository.findByPostIdAndStatus(nonExistPostId, PostStatus.ACTIVE)).willReturn(Optional.empty());
+
+        // == When ==
+        ApiException exception = assertThrows(ApiException.class, () -> {
+            postService.updatePost(nonExistPostId, mockCurrentUser, updateRequest);
+        });
+
+        // == Then ==
+        assertEquals(ErrorMessage.NOT_FOUND, exception.getErrorMessage());
+        assertEquals(PostErrorCode.POST_NOT_FOUND, exception.getErrorCode());
+
+        // == Verify ==
+        verify(postRepository).findByPostIdAndStatus(nonExistPostId,PostStatus.ACTIVE);
+        verify(postRepository, never()).save(any());
+    }
 }
