@@ -455,7 +455,7 @@ public class PostServiceTest {
         Post mockPost = new Post();
         mockPost.setPostId(postId);
         mockPost.setBoard(mockPostBoard);
-        mockPost.setAuthor(new User()); // 文章作者不是 Admin
+        mockPost.setAuthor(mockPostUser); // 文章作者不是 Admin
         mockPost.setTitle("關於SpringBoot的問題");
         mockPost.setBody("請問如何創建專案?");
         mockPost.setLikeCount(0);
@@ -572,7 +572,7 @@ public class PostServiceTest {
 
         UpdatePostRequest updateRequest = new UpdatePostRequest();
         updateRequest.setTitle("更新後的標題");
-        updateRequest.setBody(expectedOriginalBody); // 只更新標題
+        updateRequest.setBody(null); // 只更新標題
 
         given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
 
@@ -610,7 +610,7 @@ public class PostServiceTest {
         Post mockPost = new Post();
         mockPost.setPostId(postId);
         mockPost.setBoard(mockPostBoard);
-        mockPost.setAuthor(new User()); // 文章作者不是 Admin
+        mockPost.setAuthor(mockPostUser); // 文章作者不是 Admin
         mockPost.setTitle("關於SpringBoot的問題");
         mockPost.setBody("請問如何創建專案?");
         mockPost.setLikeCount(0);
