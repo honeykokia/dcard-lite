@@ -30,13 +30,13 @@ public class PostController {
     public ResponseEntity<DeletePostResponse> deletePost(
             @PathVariable @Positive(message = "PATH_FORMAT_ERROR") Long postId,
             @AuthenticationPrincipal User user) {
-        DeletePostResponse response = postService.deletePost(postId,user);
+        DeletePostResponse response = postService.deletePost(postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PatchMapping("/{postId}")
     public ResponseEntity<UpdatePostResponse> updatePost(
-            @PathVariable @Positive(message = "PATH_FORMAT_ERROR")  Long postId,
+            @PathVariable @Positive(message = "PATH_FORMAT_ERROR") Long postId,
             @AuthenticationPrincipal User user,
             @Valid @RequestBody UpdatePostRequest request) {
         UpdatePostResponse response = postService.updatePost(postId, user, request);
