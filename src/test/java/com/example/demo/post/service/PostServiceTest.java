@@ -568,9 +568,11 @@ public class PostServiceTest {
         mockPost.setStatus(PostStatus.ACTIVE);
         mockPost.setCreatedAt(Instant.now());
 
+        String expectedOriginalBody = "請問如何創建專案?";
+
         UpdatePostRequest updateRequest = new UpdatePostRequest();
         updateRequest.setTitle("更新後的標題");
-        updateRequest.setBody(null); // 只更新標題
+        updateRequest.setBody(expectedOriginalBody); // 只更新標題
 
         given(postRepository.findByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
 
@@ -583,7 +585,7 @@ public class PostServiceTest {
         verify(postRepository).save(postCaptor.capture());
         Post savedPost = postCaptor.getValue();
         assertEquals(savedPost.getTitle(),updateRequest.getTitle());
-        assertEquals(savedPost.getBody(),mockPost.getBody()); // 內容保持不變
+        assertEquals(savedPost.getBody(),expectedOriginalBody); // 內容保持不變
     }
 
     @Test
