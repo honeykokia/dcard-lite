@@ -182,7 +182,7 @@ DeletePostResponse deletePost(long postId, User currentUser);
 		- 搜尋ACTIVE文章: 呼叫 `findByPostIdAndStatus(long postId, PostStatus status)`
 		- 若結果為空，拋出例外 `POST_NOT_FOUND`
 	- **STEP2**
-		- 檢查 `post.getAuthor().getId()` 是否等於 `userId`
+		- 檢查 `post.getAuthor().getId()` 是否等於 `currentUser.getId()`
 		- 若不一致，且使用者非`ADMIN`，拋出例外 `NOT_POST_AUTHOR`
 	- **STEP3**
 		- 進行文章狀態修改，將Post 的status設為 `DELETED`並儲存`save()`
@@ -351,15 +351,15 @@ Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
 - Given
 	- userId = 1 (Mock User)
 	- postId = 1
-	- **Request Body**
+- When
+	- 呼叫 `PATCH /posts/1` (帶入 Body)
+    - **Request Body**
 	  ```json
       {
         "title": "新標題",
         "body": "新內容"
       }
       ```
-- When
-	- 呼叫 `PATCH /posts/1` (帶入 Body)
 - Then
 	- `status`: 200 OK
 	- `ResponseBody`:
@@ -371,14 +371,14 @@ Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
 - Given
 	- userId = 1
 	- postId = 1
+- When
+	- 呼叫 `PATCH /posts/1`
 	- **Request Body**
 	  ```json
       {
         "title": "只改標題"
       }
       ```
-- When
-	- 呼叫 `PATCH /posts/1`
 - Then
 	- `status`: 200 OK
 	- `ResponseBody`:
@@ -389,7 +389,7 @@ Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
 ##### Path 驗證失敗
 - Given
 	- userId = 1 (Mock User)
-	- **Secnario Inputs** (`postId_input`)
+	- **Scenario Inputs** (`postId_input`)
 		- 0
 		- -1
 		- abc
@@ -415,7 +415,14 @@ Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
 		- `a.repeat(51)` (超過最大長度 50)
 		- `<script>alert(1)</script>` (包含完整標籤)
 - When
-	- 呼叫 `PATCH /posts/1?title={title_input}`
+    - 呼叫 `PATCH /posts/1`
+    - **Request Body**
+      ```json
+      {
+        "title": "{title_input}",
+        "body": "正常內容"
+      }
+      ```
 - Then
 	- `status`
 		- 400 Bad Request
@@ -437,7 +444,14 @@ Optional<Post> findByPostIdAndStatus(long postId, PostStatus status);
 		- `a.repeat(301)` (超過最大長度 300)**
 		- `<script>alert(1)</script>` (包含完整標籤)
 - When
-	- 呼叫 `PATCH /posts/1?body={body_input}`
+	- 呼叫 `PATCH /posts/1`
+	- **Request Body**
+	  ```json
+      {
+        "title": "正常標題" ,
+        "body": "{body_input}"
+      }
+      ```
 - Then
 	- `status`
 		- 400 Bad Request
