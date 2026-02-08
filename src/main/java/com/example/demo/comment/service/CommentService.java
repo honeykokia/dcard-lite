@@ -24,11 +24,15 @@ public class CommentService {
 
     @Transactional
     public CreateCommentResponse createComment(long postId, User currentUser, CreateCommentRequest createCommentRequest) {
+
+        // 先更新評論數，避免在同一個 transaction 內對已載入的 Post 進行 bulk update 造成 stale entity
+        postRepository.incrementCommentCount(postId);
+
         // 檢查文章是否存在且狀態為 ACTIVE
         Post post = postRepository.findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE)
                 .orElseThrow(() -> new ApiException(ErrorMessage.NOT_FOUND, CommentErrorCode.POST_NOT_FOUND));
 
-        postRepository.incrementCommentCount(postId);
+
 
         // 创建评论
         Comment comment = new Comment();
