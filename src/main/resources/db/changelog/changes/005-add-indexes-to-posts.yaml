@@ -7,12 +7,15 @@ databaseChangeLog:
             tableName: posts
             indexName: idx_posts_board_created
             columns:
-              - columnName: board_id
-              - columnName: created_at
+              - column: # 必須嵌套在 column 節點下
+                  name: board_id # 使用 name
+              - column:
+                  name: created_at
         - createIndex:
             tableName: posts
             indexName: idx_posts_board_hot
             columns:
-              - columnName: board_id
-              - columnName: hot_score
-
+              - column:
+                  name: board_id
+              - column:
+                  name: hot_score
