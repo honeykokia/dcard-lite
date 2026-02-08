@@ -33,7 +33,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Modifying
     @Query("UPDATE Post p SET p.commentCount = p.commentCount + 1 WHERE p.postId = :postId")
-    void incrementCommentCount(long postId);
+    void incrementCommentCount(@Param("postId") long postId);
 
     Optional<Post> findBasicByPostIdAndStatus(long postId, PostStatus status);
 
