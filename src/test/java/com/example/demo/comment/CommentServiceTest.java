@@ -88,7 +88,7 @@ public class CommentServiceTest {
     @Test
     void createComment_PostNotFound_ThrowsException() {
         // == Given ==
-        long postId = 1L;
+        long postId = 3L; //DB資料不存在此文章
 
         User mockCurrentUser = new User();
         mockCurrentUser.setUserId(1L);
@@ -109,9 +109,9 @@ public class CommentServiceTest {
         assertEquals(ErrorMessage.NOT_FOUND.name(), exception.getMessage());
         assertEquals(CommentErrorCode.POST_NOT_FOUND, exception.getErrorCode());
 
-        // == Vrify ==
+        // == Verify ==
+        verify(postRepository, times(1)).incrementCommentCount(postId);
         verify(postRepository).findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE);
-        verify(postRepository, never()).incrementCommentCount(postId);
         verify(commentRepository, never()).save(any());
 
     }
