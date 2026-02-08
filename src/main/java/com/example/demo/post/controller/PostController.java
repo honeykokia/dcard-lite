@@ -1,5 +1,8 @@
 package com.example.demo.post.controller;
 
+import com.example.demo.comment.dto.CreateCommentRequest;
+import com.example.demo.comment.dto.CreateCommentResponse;
+import com.example.demo.comment.service.CommentService;
 import com.example.demo.post.dto.DeletePostResponse;
 import com.example.demo.post.dto.GetPostResponse;
 import com.example.demo.post.dto.UpdatePostRequest;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
+    private final CommentService commentService;
 
     @GetMapping("/{postId}")
     public ResponseEntity<GetPostResponse> getPost(@Positive(message = "PATH_FORMAT_ERROR") @PathVariable Long postId) {
@@ -41,5 +45,14 @@ public class PostController {
             @Valid @RequestBody UpdatePostRequest request) {
         UpdatePostResponse response = postService.updatePost(postId, user, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PostMapping("/{postId}/comments")
+    public ResponseEntity<CreateCommentResponse> createComment(
+            @PathVariable @Positive(message = "PATH_FORMAT_ERROR") Long postId,
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody CreateCommentRequest request) {
+        CreateCommentResponse response = commentService.createComment(postId, user, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
