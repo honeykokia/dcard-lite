@@ -3,7 +3,7 @@
 ### Who?
 - User
 ### What?
-- 使用者可以再指定文章底下新增留言
+- 使用者可以在指定文章底下新增留言
 ### Success?
 - 留言成功，201 Created
 ### Failure?
@@ -15,7 +15,7 @@
         - `post_id` (FK, BIGINT)
         - `author_id` (FK, BIGINT)
         - `body` (VARCHAR(200), NOT NULL)
-        - `status` (VARCHAR(20), NOT NULL, DEFATULT = "ACTIVE")
+        - `status` (VARCHAR(20), NOT NULL, DEFAULT = "ACTIVE")
         - `created_at` (DATETIME(6), NOT NULL)
         - `updated_at` (DATETIME(6), NOT NULL)
     - Constraints
@@ -91,7 +91,7 @@
 #### Response (Success)
 ```json
 {
-	"commentId": "1"
+	"commentId": 1
 	
 }
 ```
