@@ -26,7 +26,11 @@ public class CommentService {
     public CreateCommentResponse createComment(long postId, User currentUser, CreateCommentRequest createCommentRequest) {
 
         // 先更新評論數，避免在同一個 transaction 內對已載入的 Post 進行 bulk update 造成 stale entity
-        postRepository.incrementCommentCount(postId);
+        int updateRows = postRepository.incrementCommentCount(postId, PostStatus.ACTIVE);
+
+        if (updateRows == 0){
+            throw new ApiException(ErrorMessage.NOT_FOUND, CommentErrorCode.POST_NOT_FOUND);
+        }
 
         // 檢查文章是否存在且狀態為 ACTIVE
         Post post = postRepository.findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE)
