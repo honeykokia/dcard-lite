@@ -2,7 +2,7 @@
 
 以 Spring Boot 建立的「看板 / 文章 / 留言」最小可行論壇後端,支援註冊登入(JWT)、看板列表、發文、文章列表(latest/hot)、文章詳情、文章編輯/刪除(作者/管理者)、文章留言等功能。
 
-> 💡 規格與測試案例以 [`/docs/**`](docs) 為準:FSD + 各 RP 文件。
+> 💡 規格與測試案例以 [`/docs/**`](backend/docs) 為準:FSD + 各 RP 文件。
 
 ---
 
@@ -29,10 +29,10 @@
 
 - **Java 17 LTS**
 - **Spring Boot 3.x** (REST API、Validation、Security)
-- **Maven** (含 Wrapper:[`mvnw`](mvnw)、[`pom.xml`](pom.xml))
-- **MySQL** + **Liquibase** (schema 變更:[`/src/main/resources/db/changelog/**`](src/main/resources/db/changelog))
+- **Maven** (含 Wrapper:[`mvnw`](backend/mvnw)、[`pom.xml`](backend/pom.xml))
+- **MySQL** + **Liquibase** (schema 變更:[`/src/main/resources/db/changelog/**`](backend/src/main/resources/db/changelog))
 - **JWT** 認證機制
-- **JUnit 5** + **Mockito** (單元測試範例:[`PostServiceTest`](src/test/java/com/example/demo/post/service/PostServiceTest.java))
+- **JUnit 5** + **Mockito** (單元測試範例:[`PostServiceTest`](backend/src/test/java/com/example/demo/post/service/PostServiceTest.java))
 
 ---
 <a id="project-features"></a>
@@ -53,20 +53,20 @@
 
 ### 建議閱讀順序
 
-1. **系統總覽** - [`docs/fsd/dcard-lite-forum-fsd-v1.md`](docs/fsd/dcard-lite-forum-fsd-v1.md)
+1. **系統總覽** - [`docs/fsd/dcard-lite-forum-fsd-v1.md`](backend/docs/fsd/dcard-lite-forum-fsd-v1.md)
    - 專案目標、功能列表、系統架構、非功能性需求
 
-2. **API 規格** - [`docs/api/api-spec.yaml`](docs/api/api-spec.yaml)
+2. **API 規格** - [`docs/api/api-spec.yaml`](backend/docs/api/api-spec.yaml)
    - OpenAPI 3.0 格式的完整 API 文件
 
 3. **功能模組 (RP 文件)** - 每個模組包含詳細的設計與測試案例
-   - RP-001: [註冊與登入](docs/rp/001-register-login.md)
-   - RP-002: [看板列表](docs/rp/002-listboards.md)
-   - RP-003: [發表文章](docs/rp/003-create-post.md)
-   - RP-004: [文章列表](docs/rp/004-list-posts.md)
-   - RP-005: [文章詳情](docs/rp/005-get-post.md)
-   - RP-006: [編輯/刪除文章](docs/rp/006-update_delete_post.md)
-   - RP-007: [文章留言](docs/rp/007-create-comment.md)
+   - RP-001: [註冊與登入](backend/docs/rp/001-register-login.md)
+   - RP-002: [看板列表](backend/docs/rp/002-listboards.md)
+   - RP-003: [發表文章](backend/docs/rp/003-create-post.md)
+   - RP-004: [文章列表](backend/docs/rp/004-list-posts.md)
+   - RP-005: [文章詳情](backend/docs/rp/005-get-post.md)
+   - RP-006: [編輯/刪除文章](backend/docs/rp/006-update_delete_post.md)
+   - RP-007: [文章留言](backend/docs/rp/007-create-comment.md)
 
 ---
 <a id="project-structure"></a>
@@ -158,7 +158,7 @@ jwt:
   expiration: 86400000  # 24 小時 (毫秒)
 ```
 
-> 💡 JWT 配置說明請參考 [`JwtService.java`](src/main/java/com/example/demo/common/security/JwtService.java)
+> 💡 JWT 配置說明請參考 [`JwtService.java`](backend/src/main/java/com/example/demo/common/security/JwtService.java)
 
 ### 4. 啟動應用
 
@@ -202,38 +202,38 @@ mvnw.cmd test
 
 ### 測試覆蓋範例
 
-- 單元測試: [`PostServiceTest`](src/test/java/com/example/demo/post/service/PostServiceTest.java)
+- 單元測試: [`PostServiceTest`](backend/src/test/java/com/example/demo/post/service/PostServiceTest.java)
 - 更多測試案例請參考各 RP 文件的 Test 章節
 
 ---
 <a id="api-overview"></a>
 ## 📡 API 概覽
 
-> 完整的 API 規格請參考 [`docs/api/api-spec.yaml`](docs/api/api-spec.yaml)
+> 完整的 API 規格請參考 [`docs/api/api-spec.yaml`](backend/docs/api/api-spec.yaml)
 
 ### 認證 (Auth)
 
 | Method | Endpoint            | Description | RP Doc |
 |--------|---------------------|-------------|--------|
-| POST   | /users/register     | 使用者註冊 | [RP-001](docs/rp/001-register-login.md) |
-| POST   | /users/login        | 使用者登入 | [RP-001](docs/rp/001-register-login.md) |
+| POST   | /users/register     | 使用者註冊 | [RP-001](backend/docs/rp/001-register-login.md) |
+| POST   | /users/login        | 使用者登入 | [RP-001](backend/docs/rp/001-register-login.md) |
 
 ### 看板 (Boards)
 
 | Method | Endpoint | Description | Auth | RP Doc |
 |--------|----------|-------------|------|--------|
-| GET    | /boards  | 查詢看板列表(支援分頁、keyword) | ❌ | [RP-002](docs/rp/002-listboards.md) |
+| GET    | /boards  | 查詢看板列表(支援分頁、keyword) | ❌ | [RP-002](backend/docs/rp/002-listboards.md) |
 
 ### 文章 (Posts)
 
 | Method | Endpoint                    | Description | Auth | RP Doc |
 |--------|----------------------------|-------------|------|--------|
-| POST   | /boards/{boardId}/posts    | 發表文章 | ✅ | [RP-003](docs/rp/003-create-post.md) |
-| GET    | /boards/{boardId}/posts    | 查詢文章列表(分頁、排序) | ❌ | [RP-004](docs/rp/004-list-posts.md) |
-| GET    | /posts/{postId}            | 查詢文章詳情 | ❌ | [RP-005](docs/rp/005-get-post.md) |
-| PATCH  | /posts/{postId}            | 編輯文章(作者/ADMIN) | ✅ | [RP-006](docs/rp/006-update_delete_post.md) |
-| DELETE | /posts/{postId}            | 刪除文章(作者/ADMIN) | ✅ | [RP-006](docs/rp/006-update_delete_post.md) |
-| POST   | /posts/{postId}/comments   | 新增留言 | ✅ | [RP-007](docs/rp/007-create-comment.md) |
+| POST   | /boards/{boardId}/posts    | 發表文章 | ✅ | [RP-003](backend/docs/rp/003-create-post.md) |
+| GET    | /boards/{boardId}/posts    | 查詢文章列表(分頁、排序) | ❌ | [RP-004](backend/docs/rp/004-list-posts.md) |
+| GET    | /posts/{postId}            | 查詢文章詳情 | ❌ | [RP-005](backend/docs/rp/005-get-post.md) |
+| PATCH  | /posts/{postId}            | 編輯文章(作者/ADMIN) | ✅ | [RP-006](backend/docs/rp/006-update_delete_post.md) |
+| DELETE | /posts/{postId}            | 刪除文章(作者/ADMIN) | ✅ | [RP-006](backend/docs/rp/006-update_delete_post.md) |
+| POST   | /posts/{postId}/comments   | 新增留言 | ✅ | [RP-007](backend/docs/rp/007-create-comment.md) |
 
 ### 文章排序選項
 
@@ -330,7 +330,7 @@ src/main/resources/db/changelog/
   - 使用索引: `idx_posts_board_hot (board_id, hot_score)`
   - 排序依據: `hot_score DESC`
 
-詳細說明請參考 [RP-004](docs/rp/004-list-posts.md)
+詳細說明請參考 [RP-004](backend/docs/rp/004-list-posts.md)
 
 ### 驗證規則範例
 
@@ -339,13 +339,13 @@ src/main/resources/db/changelog/
 - Email: 有效格式,最長100字元,儲存前轉小寫
 - Password: 8-12字元,至少包含一個字母和數字
 
-參考: [`RegisterUserRequest.java`](src/main/java/com/example/demo/user/dto/RegisterUserRequest.java)
+參考: [`RegisterUserRequest.java`](backend/src/main/java/com/example/demo/user/dto/RegisterUserRequest.java)
 
 #### 文章驗證
 - Title: 1-50字元,不可純空白,禁止 `<` `>` 符號
 - Body: 1-300字元,不可純空白,允許換行,禁止 `<` `>` 符號
 
-參考: [RP-003](docs/rp/003-create-post.md)
+參考: [RP-003](backend/docs/rp/003-create-post.md)
 
 ---
 <a id="deployment"></a>
@@ -369,10 +369,10 @@ java -jar target/demo-*.jar
 <a id="other-docs"></a>
 ## 📝 其他文件
 
-- [Spring Boot 幫助文件](HELP.md)
-- [OpenAPI 規格](docs/api/api-spec.yaml)
-- [實體關聯圖](docs/db/er-map.png)
-- [系統 FSD](docs/fsd/dcard-lite-forum-fsd-v1.md)
+- [Spring Boot 幫助文件](backend/HELP.md)
+- [OpenAPI 規格](backend/docs/api/api-spec.yaml)
+- [實體關聯圖](backend/docs/db/er-map.png)
+- [系統 FSD](backend/docs/fsd/dcard-lite-forum-fsd-v1.md)
 
 ---
 <a id="license"></a>
