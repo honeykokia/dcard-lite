@@ -9,19 +9,22 @@
 ## 📚 目錄
 
 - [Tech Stack](#tech-stack)
-- [專案特色](#專案特色)
-- [文件結構](#文件結構)
-- [專案結構](#專案結構)
-- [先決條件](#先決條件)
-- [快速開始](#快速開始)
-- [測試](#測試)
-- [API 概覽](#api-概覽)
-- [錯誤回應格式](#錯誤回應格式)
-- [資料庫架構](#資料庫架構)
-- [參考資訊](#參考資訊)
-
+- [專案特色](#project-features)
+- [文件結構](#documentation-structure)
+- [專案結構](#project-structure)
+- [先決條件](#prerequisites)
+- [快速開始](#quick-start)
+- [測試](#testing)
+- [API 概覽](#api-overview)
+- [錯誤回應格式](#error-response)
+- [資料庫架構](#database-schema)
+- [參考資訊](#references)
+- [打包部署](#deployment)
+- [其他文件](#other-docs)
+- [授權](#license)
+- [貢獻](#contributing)
 ---
-
+<a id="tech-stack"></a>
 ## 🛠 Tech Stack
 
 - **Java 17 LTS**
@@ -32,7 +35,7 @@
 - **JUnit 5** + **Mockito** (單元測試範例:[`PostServiceTest`](src/test/java/com/example/demo/post/service/PostServiceTest.java))
 
 ---
-
+<a id="project-features"></a>
 ## ✨ 專案特色
 
 - ✅ **完整的 RESTful API** - 遵循 REST 最佳實踐
@@ -45,7 +48,7 @@
 - ✅ **單元測試** - 完整的測試覆蓋率
 
 ---
-
+<a id="documentation-structure"></a>
 ## 📖 文件結構
 
 ### 建議閱讀順序
@@ -66,7 +69,7 @@
    - RP-007: [文章留言](docs/rp/007-create-comment.md)
 
 ---
-
+<a id="project-structure"></a>
 ## 📁 專案結構
 
 ```
@@ -113,7 +116,7 @@ demo/
 ```
 
 ---
-
+<a id="prerequisites"></a>
 ## 📋 先決條件
 
 - **Java 17** 或更高版本
@@ -121,7 +124,7 @@ demo/
 - **Maven** (建議使用專案內的 Maven Wrapper)
 
 ---
-
+<a id="quick-start"></a>
 ## 🚀 快速開始
 
 ### 1. 克隆專案
@@ -178,7 +181,7 @@ curl http://localhost:8080/actuator/health
 ```
 
 ---
-
+<a id="testing"></a>
 ## 🧪 測試
 
 ### 執行所有測試
@@ -203,7 +206,7 @@ mvnw.cmd test
 - 更多測試案例請參考各 RP 文件的 Test 章節
 
 ---
-
+<a id="api-overview"></a>
 ## 📡 API 概覽
 
 > 完整的 API 規格請參考 [`docs/api/api-spec.yaml`](docs/api/api-spec.yaml)
@@ -238,7 +241,7 @@ mvnw.cmd test
 - `hot` - 依照熱門分數(高到低)
 
 ---
-
+<a id="error-response"></a>
 ## ⚠️ 錯誤回應格式
 
 所有錯誤回應遵循統一格式:
@@ -269,7 +272,7 @@ mvnw.cmd test
 | 409 | CONFLICT | EMAIL_ALREADY_EXISTS | Email 已被註冊 |
 
 ---
-
+<a id="database-schema"></a>
 ## 🗄️ 資料庫架構
 
 ### 主要資料表
@@ -312,7 +315,7 @@ src/main/resources/db/changelog/
 ```
 
 ---
-
+<a id="references"></a>
 ## 📚 參考資訊
 
 ### 排序與索引設計
@@ -345,7 +348,7 @@ src/main/resources/db/changelog/
 參考: [RP-003](docs/rp/003-create-post.md)
 
 ---
-
+<a id="deployment"></a>
 ## 🔧 打包部署
 
 ### 建立 JAR 檔案
@@ -363,22 +366,22 @@ java -jar target/demo-*.jar
 ```
 
 ---
-
+<a id="other-docs"></a>
 ## 📝 其他文件
 
 - [Spring Boot 幫助文件](HELP.md)
 - [OpenAPI 規格](docs/api/api-spec.yaml)
-- [實體關聯圖](docs/db/er-diagram.puml)
+- [實體關聯圖](docs/db/er-map.png)
 - [系統 FSD](docs/fsd/dcard-lite-forum-fsd-v1.md)
 
 ---
-
+<a id="license"></a>
 ## 📄 授權
 
 此專案為教學與面試展示用途。
 
 ---
-
+<a id="contributing"></a>
 ## 🤝 貢獻
 
 歡迎提交 Issue 和 Pull Request!
