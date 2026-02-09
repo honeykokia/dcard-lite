@@ -32,8 +32,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostItem> findByBoardId(@Param("boardId") Long boardId, @Param("status") PostStatus status, Pageable pageable);
 
     @Modifying
-    @Query("UPDATE Post p SET p.commentCount = p.commentCount + 1 WHERE p.postId = :postId")
-    void incrementCommentCount(@Param("postId") long postId);
+    @Query("UPDATE Post p SET p.commentCount = p.commentCount + 1 WHERE p.postId = :postId AND p.status = :status")
+    int incrementCommentCount(@Param("postId") long postId, @Param("status") PostStatus status);
 
     Optional<Post> findBasicByPostIdAndStatus(long postId, PostStatus status);
 
