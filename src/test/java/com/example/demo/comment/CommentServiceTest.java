@@ -15,6 +15,8 @@ import com.example.demo.user.entity.User;
 import com.example.demo.user.entity.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -62,7 +64,7 @@ public class CommentServiceTest {
         savedComment.setPost(mockPost);
         savedComment.setAuthor(mockCurrentUser);
         savedComment.setBody(mockRequest.getBody());
-
+        given(postRepository.incrementCommentCount(postId, PostStatus.ACTIVE)).willReturn(1);
         given(postRepository.findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.of(mockPost));
         given(commentRepository.save(any(Comment.class))).willReturn(savedComment);
 
@@ -74,7 +76,7 @@ public class CommentServiceTest {
         assertEquals(1L, response.getCommentId());
 
         // == Verify ==
-        verify(postRepository, times(1)).incrementCommentCount(postId);
+        verify(postRepository, times(1)).incrementCommentCount(postId, PostStatus.ACTIVE);
         verify(postRepository).findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE);
         ArgumentCaptor<Comment> commentArgumentCaptor = ArgumentCaptor.forClass(Comment.class);
         verify(commentRepository).save(commentArgumentCaptor.capture());
@@ -85,10 +87,13 @@ public class CommentServiceTest {
 
     }
 
-    @Test
-    void createComment_PostNotFound_ThrowsException() {
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2", //文章已被刪除，狀態為DELETED
+            "3"  //文章不存在
+    })
+    void createComment_PostNotFound_ThrowsException(long postId) {
         // == Given ==
-        long postId = 3L; //DB資料不存在此文章
 
         User mockCurrentUser = new User();
         mockCurrentUser.setUserId(1L);
@@ -98,7 +103,7 @@ public class CommentServiceTest {
         CreateCommentRequest mockRequest = new CreateCommentRequest();
         mockRequest.setBody("這是一則留言");
 
-        given(postRepository.findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE)).willReturn(Optional.empty());
+        given(postRepository.incrementCommentCount(eq(postId), eq(PostStatus.ACTIVE))).willReturn(0);
 
         // == When ==
         ApiException exception = assertThrows(ApiException.class, () ->{
@@ -110,8 +115,8 @@ public class CommentServiceTest {
         assertEquals(CommentErrorCode.POST_NOT_FOUND, exception.getErrorCode());
 
         // == Verify ==
-        verify(postRepository, times(1)).incrementCommentCount(postId);
-        verify(postRepository).findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE);
+        verify(postRepository, times(1)).incrementCommentCount(eq(postId), eq(PostStatus.ACTIVE));
+        verify(postRepository, never()).findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE);
         verify(commentRepository, never()).save(any());
 
     }
