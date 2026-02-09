@@ -129,11 +129,12 @@
         - `commentId` (long)
 - **Logic Steps**
     - **STEP1**
+        - 呼叫 `incrementCommentCount(postId)` 使文章留言數+1
+        - 使用原子更新防止流量過大，讀取到舊數字
+        - 若更新影響行數為0，表示文章不存在，拋出例外 `POST_NOT_FOUND`
+    - **STEP2**
         - 搜尋ACTIVE文章: 呼叫 `findBasicByPostIdAndStatus(postId, PostStatus.ACTIVE)`
         - 若結果為空，拋出例外 `POST_NOT_FOUND`
-    - **STEP2**
-        - 如果文章存在，呼叫 `incrementCommentCount(postId)` 使文章留言數+1
-        - 使用原子更新防止流量過大，讀取到舊數字
     - **STEP3**
         - 建立 `Comment`物件
         - 設定 `postId` : 關聯至STEP1查出的`Post`
@@ -146,10 +147,10 @@
 ## Data Access
 ### `PostRepository`
 ```java
-@Modifying  
-@Query("UPDATE Post p SET p.commentCount = p.commentCount + 1 WHERE p.postId = :postId")  
-void incrementCommentCount(long postId);  
-  
+@Modifying
+@Query("UPDATE Post p SET p.commentCount = p.commentCount + 1 WHERE p.postId = :postId AND p.status = :status")
+int incrementCommentCount(@Param("postId") long postId, @Param("status") PostStatus status);
+
 Optional<Post> findBasicByPostIdAndStatus(long postId, PostStatus status);
 ```
 ### `CommentRepository`
