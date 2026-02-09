@@ -142,8 +142,8 @@
 ```json
 {
 	"postId": 1,
-	"title": "想問關於Java的問題",
-	"body" : "Java Stack使用場合是在什麼地方?"
+	"title": "修改後的標題",
+	"body": "修改後的內容"
 }
 ```
 #### Response (Error)

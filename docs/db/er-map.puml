@@ -32,6 +32,19 @@ entity "Post" as Post {
   * updated_at : DATETIME(6)
 }
 
+entity "Comment" as Comment {
+  * comment_id : BIGINT <<PK>>
+  --
+  * post_id : BIGINT <<FK>>
+  * author_id : BIGINT <<FK>>
+  * body : VARCHAR(200)
+  * status : VARCHAR(20) <<default: 'ACTIVE'>>
+  * created_at : DATETIME(6)
+  * updated_at : DATETIME(6)
+}
+
 Board ||--o{ Post : "has posts"
 User ||--o{ Post : "creates posts"
+Post ||--o{ Comment : "has comments"
+User ||--o{ Comment : "creates comments"
 @enduml

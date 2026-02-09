@@ -1,5 +1,9 @@
 package com.example.demo.post.controller;
 
+import com.example.demo.comment.dto.CreateCommentRequest;
+import com.example.demo.comment.dto.CreateCommentResponse;
+import com.example.demo.comment.error.CommentErrorCode;
+import com.example.demo.comment.service.CommentService;
 import com.example.demo.common.error.ErrorMessage;
 import com.example.demo.common.exception.ApiException;
 import com.example.demo.common.exception.GlobalExceptionHandler;
@@ -66,6 +70,9 @@ public class PostControllerTest {
 
     @MockitoBean
     private PostService postService;
+
+    @MockitoBean
+    private CommentService commentService;
 
 
     @Test
@@ -563,5 +570,149 @@ public class PostControllerTest {
                 eq(mockUser),
                 refEq(mockRequest)
         );
+    }
+
+    @Test
+    void createComment_success() throws Exception {
+        // == Given ==
+        User mockUser = new User();
+        mockUser.setUserId(2L);
+        mockUser.setEmail("leo@example.com");
+        mockUser.setPasswordHash("pass");
+        mockUser.setRole(UserRole.USER);
+
+        long postId = 1L;
+        CreateCommentRequest mockRequest = new CreateCommentRequest();
+        mockRequest.setBody("這是一則留言");
+
+        CreateCommentResponse mockResponse = new CreateCommentResponse();
+        mockResponse.setCommentId(1L);
+
+        given(commentService.createComment(eq(postId), eq(mockUser), refEq(mockRequest)))
+                .willReturn(mockResponse);
+
+        // == When ==
+        ResultActions result = mockMvc.perform(post("/posts/{postId}/comments", postId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(mockUser))
+                .content(objectMapper.writeValueAsString(mockRequest)));
+
+        // == Then ==
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.commentId").value(1L));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "0",
+            "-1",
+            "abc"
+    })
+    void createComment_InvalidPath_Return400(String invalidPostId) throws Exception {
+        // == Given ==
+        User mockUser = new User();
+        mockUser.setUserId(2L);
+        mockUser.setEmail("leo@example.com");
+        mockUser.setPasswordHash("pass");
+        mockUser.setRole(UserRole.USER);
+
+        CreateCommentRequest mockRequest = new CreateCommentRequest();
+        mockRequest.setBody("這是一則留言");
+
+        // == When & Then ==
+        mockMvc.perform(post("/posts/{postId}/comments", invalidPostId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(mockUser))
+                        .content(objectMapper.writeValueAsString(mockRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ErrorMessage.VALIDATION_FAILED.name()))
+                .andExpect(jsonPath("$.code").value(CommentErrorCode.PATH_FORMAT_ERROR.name()));
+    }
+
+    static Stream<Arguments> provideInvalidBodiesForComment() {
+        return Stream.of(
+                // 情境 1: null (建議補上，驗證 @NotNull)
+                Arguments.of((Object) null),
+                // 情境 2: 空字串 (驗證 @NotBlank)
+                Arguments.of(""),
+                // 情境 3: 全空白 (驗證 @NotBlank)
+                Arguments.of("    "),
+                // 情境 4: 超過 200 字 (驗證 @Size max=200)
+                Arguments.of("a".repeat(201)),
+                // 情境 5: 包含 HTML 標籤 (驗證安全性過濾或禁止)
+                Arguments.of("<script>alert('hack')</script>")
+        );
+    }
+    @ParameterizedTest(name = "留言內容測試: body={0} 應回傳 400")
+    @MethodSource("provideInvalidBodiesForComment")
+    void createComment_InvalidBody_Return400(String invalidBody) throws Exception {
+        // == Given ==
+        User mockUser = new User();
+        mockUser.setUserId(2L);
+        mockUser.setEmail("leo@example.com");
+        mockUser.setPasswordHash("pass");
+        mockUser.setRole(UserRole.USER);
+
+        long postId = 1L;
+        CreateCommentRequest mockRequest = new CreateCommentRequest();
+        mockRequest.setBody(invalidBody);
+
+        // == When & Then ==
+        mockMvc.perform(post("/posts/{postId}/comments", postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(user(mockUser))
+                        .content(objectMapper.writeValueAsString(mockRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ErrorMessage.VALIDATION_FAILED.name()))
+                .andExpect(jsonPath("$.code").value(CommentErrorCode.BODY_INVALID.name()));
+
+    }
+
+    @Test
+    void createComment_Unauthorized_Return401() throws Exception {
+        // == Given ==
+        long postId = 1L;
+        CreateCommentRequest mockRequest = new CreateCommentRequest();
+        mockRequest.setBody("這是一則留言");
+
+        // == When & Then ==
+        mockMvc.perform(post("/posts/{postId}/comments", postId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(mockRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value(ErrorMessage.UNAUTHORIZED.name()))
+                .andExpect(jsonPath("$.code").value(CommentErrorCode.SECURITY_UNAUTHORIZED.name()));
+    }
+
+    @Test
+    void createComment_PostNotFound_Return404() throws Exception {
+        // == Given ==
+        User mockUser = new User();
+        mockUser.setUserId(2L);
+        mockUser.setEmail("leo@example.com");
+        mockUser.setPasswordHash("pass");
+        mockUser.setRole(UserRole.USER);
+
+        long postId = 3L; //資料庫不存在
+        CreateCommentRequest mockRequest = new CreateCommentRequest();
+        mockRequest.setBody("這是一則留言");
+        ApiException expectedException = new ApiException(
+                ErrorMessage.NOT_FOUND,
+                CommentErrorCode.POST_NOT_FOUND
+        );
+        given(commentService.createComment(eq(postId), eq(mockUser), refEq(mockRequest)))
+                .willThrow(expectedException);
+
+        // == When ==
+        ResultActions result = mockMvc.perform(post("/posts/{postId}/comments", postId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(user(mockUser))
+                .content(objectMapper.writeValueAsString(mockRequest)));
+
+        // == Then ==
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(ErrorMessage.NOT_FOUND.name()))
+                .andExpect(jsonPath("$.code").value(CommentErrorCode.POST_NOT_FOUND.name()));
+
     }
 }

@@ -12,6 +12,8 @@ tags:
     description: Register & Login
   - name: Boards
     description: List boards
+  - name: Posts
+    description: Create/List posts, Get/Update/Delete post details, Create comment
 
 paths:
   /users/register:
@@ -535,7 +537,7 @@ paths:
 
   /posts/{postId}:
     get:
-      tags: [Boards]
+      tags: [Posts]
       summary: Get post details
       operationId: getPost
       parameters:
@@ -600,7 +602,7 @@ paths:
                     timestamp: "2025-12-25T10:00:00Z"
 
     delete:
-      tags: [Boards]
+      tags: [Posts]
       summary: Delete a post
       security:
         - bearerAuth: []
@@ -689,7 +691,7 @@ paths:
                     timestamp: "2025-12-25T10:00:00Z"
 
     patch:
-      tags: [Boards]
+      tags: [Posts]
       summary: Update a post
       security:
         - bearerAuth: []
@@ -795,6 +797,98 @@ paths:
                     message: "NOT_FOUND"
                     code: "POST_NOT_FOUND"
                     path: "/posts/3"
+                    timestamp: "2025-12-25T10:00:00Z"
+
+  /posts/{postId}/comments:
+    post:
+      tags: [Posts]
+      summary: Add a comment to a specific post
+      operationId: createComment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          description: The ID of the post to add a comment to
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentRequest"
+            examples:
+              example:
+                value:
+                  body: "我覺得你的問題要再說詳細一點..."
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateCommentResponse"
+              examples:
+                success:
+                  value:
+                    commentId: 1
+        "400":
+          description: Bad Request (validation failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                pathFormatError:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "PATH_FORMAT_ERROR"
+                    path: "/posts/abc/comments"
+                    timestamp: "2025-12-25T10:00:00Z"
+                bodyInvalid:
+                  value:
+                    status: 400
+                    error: "Bad Request"
+                    message: "VALIDATION_FAILED"
+                    code: "BODY_INVALID"
+                    path: "/posts/1/comments"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "401":
+          description: Unauthorized (authentication failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorized:
+                  value:
+                    status: 401
+                    error: "Unauthorized"
+                    message: "UNAUTHORIZED"
+                    code: "SECURITY_UNAUTHORIZED"
+                    path: "/posts/1/comments"
+                    timestamp: "2025-12-25T10:00:00Z"
+        "404":
+          description: Not Found (post does not exist)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                postNotFound:
+                  value:
+                    status: 404
+                    error: "Not Found"
+                    message: "NOT_FOUND"
+                    code: "POST_NOT_FOUND"
+                    path: "/posts/3/comments"
                     timestamp: "2025-12-25T10:00:00Z"
 
 components:
@@ -1139,3 +1233,23 @@ components:
           type: string
           maxLength: 300
           example: "修改後的內容"
+
+    CreateCommentRequest:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+          description: Comment body (validated after trim, allows `\n`, no `<` or `>`)
+          maxLength: 200
+          example: "我覺得你的問題要再說詳細一點..."
+
+    CreateCommentResponse:
+      type: object
+      required: [commentId]
+      properties:
+        commentId:
+          type: integer
+          format: int64
+          example: 1
+

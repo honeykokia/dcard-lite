@@ -7,3 +7,7 @@ databaseChangeLog:
       file: db/changelog/changes/003-create-posts.yaml
   - include:
       file: db/changelog/changes/004-fix-typo-posts.yaml
+  - include:
+      file: db/changelog/changes/005-add-indexes-to-posts.yaml
+  - include:
+      file: db/changelog/changes/006-create-comments.yaml
