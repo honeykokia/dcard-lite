@@ -260,10 +260,10 @@ const handleRegister = async () => {
 
   try {
     await userStore.register(
-      formData.name,
-      formData.email,
-      formData.password,
-      formData.confirmPassword
+      formData.name.trim(),
+      formData.email.trim(),
+      formData.password.trim(),
+      formData.confirmPassword.trim()
     )
 
     // 註冊成功，導向登入頁
