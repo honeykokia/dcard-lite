@@ -18,6 +18,16 @@ export const useUserStore = defineStore('user', () => {
   const decodeToken = (token) => {
     try {
       const decoded = jwtDecode(token)
+
+      // 檢查是否過期 (exp 是以秒計，Date.now() 是毫秒)
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (decoded.exp < currentTime) {
+        console.warn("Token 已過期");
+        logout(); // 執行清除 localStorage 與狀態的動作
+        return;
+      }
+
       userId.value = decoded.userId || decoded.sub || ''
       role.value = decoded.role || 'USER'
       return true
@@ -30,12 +40,16 @@ export const useUserStore = defineStore('user', () => {
   const setToken = (token) => {
     accessToken.value = token
     localStorage.setItem('accessToken', token)
-
     // 解碼 token 獲取使用者資訊
     decodeToken(token)
 
     // 設置 axios 預設 header
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  }
+
+  const setDisplayName = (name) => {
+    displayName.value = name
+    localStorage.setItem('displayName', name)
   }
 
   const clearAuth = () => {
@@ -45,16 +59,19 @@ export const useUserStore = defineStore('user', () => {
     role.value = ''
 
     localStorage.removeItem('accessToken')
+    localStorage.removeItem('displayName')
     delete axios.defaults.headers.common['Authorization']
   }
 
   const login = async (email, password) => {
-    const response = await axios.post('http://localhost:8080/users/login', {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/users/login`, {
       email: email.trim(),
       password: password.trim()
     })
 
     setToken(response.data.accessToken)
+    setDisplayName(response.data.displayName)
+
     if (response.data.displayName) {
       displayName.value = response.data.displayName
     }
@@ -62,7 +79,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const register = async (name, email, password, confirmPassword) => {
-    const response = await axios.post('http://localhost:8080/users/register', {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/users/register`, {
       name: name.trim(),
       email: email.trim(),
       password: password.trim(),
