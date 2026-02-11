@@ -35,3 +35,4 @@ build/
 *.properties
 *.properties.dev
 *.properties.prod
+*.env
