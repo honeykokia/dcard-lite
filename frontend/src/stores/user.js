@@ -2,12 +2,13 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import axios from 'axios'
 import { jwtDecode } from 'jwt-decode'
+import { loginUser, registerUser } from '@/api/user'
 
 export const useUserStore = defineStore('user', () => {
   // State
   const accessToken = ref(localStorage.getItem('accessToken') || '')
   const userId = ref('')
-  const displayName = ref('')
+  const displayName = ref(localStorage.getItem('displayName') || '')
   const role = ref('')
 
   // Getters
@@ -64,29 +65,20 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const login = async (email, password) => {
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/users/login`, {
-      email: email.trim(),
-      password: password.trim()
-    })
+    const data = await loginUser(email, password)
 
-    setToken(response.data.accessToken)
-    setDisplayName(response.data.displayName)
+    setToken(data.accessToken)
+    setDisplayName(data.displayName)
 
-    if (response.data.displayName) {
-      displayName.value = response.data.displayName
+    if (data.displayName) {
+      displayName.value = data.displayName
     }
-    return response.data
+    return data
   }
 
   const register = async (name, email, password, confirmPassword) => {
-    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/users/register`, {
-      name: name.trim(),
-      email: email.trim(),
-      password: password.trim(),
-      confirmPassword: confirmPassword.trim()
-    })
-
-    return response.data
+    const data = await registerUser(name, email, password, confirmPassword)
+    return data
   }
 
   const logout = () => {
