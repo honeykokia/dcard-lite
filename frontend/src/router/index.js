@@ -21,6 +21,12 @@ const router = createRouter({
       component: () => import('../views/Register.vue'),
       meta: { requiresAuth: false }
     },
+    {
+      path: '/boards',
+      name: 'boards',
+      component: () => import('../views/Boards.vue'),
+      meta: { requiresAuth: true }
+    },
   ],
 })
 
