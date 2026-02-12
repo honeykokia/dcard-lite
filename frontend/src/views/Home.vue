@@ -56,10 +56,10 @@
             <h4 class="mb-2 text-xl font-bold text-gray-900">看板列表</h4>
             <p class="mb-4 text-sm text-gray-600">瀏覽所有討論看板</p>
             <button
-              class="w-full rounded-lg bg-gray-300 py-2.5 text-sm font-semibold text-gray-500 cursor-not-allowed"
-              disabled
+              @click="router.push('/boards')"
+              class="w-full rounded-lg bg-[#3397cf] py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#2b7fb3] hover:shadow-md active:scale-[0.98]"
             >
-              即將推出
+              前往看板
             </button>
           </div>
 
