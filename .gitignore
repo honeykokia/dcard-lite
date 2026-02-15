@@ -1,10 +1,31 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# ==============================================================================
+# System & General
+# ==============================================================================
+.DS_Store
+*.log
+logs
+*-debug.log*
+*-error.log*
+.eslintcache
+*.tsbuildinfo
+*.timestamp-*-*.mjs
 
-### STS ###
+# ==============================================================================
+# IDE & Editors (Shared)
+# ==============================================================================
+.idea
+.vscode/
+!.vscode/extensions.json
+*.iws
+*.iml
+*.ipr
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# STS (Spring Tool Suite)
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +34,7 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,10 +44,34 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# ==============================================================================
+# Backend (Java / Maven)
+# ==============================================================================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+HELP.md
 
+# ==============================================================================
+# Frontend (Node / Vue / Vite)
+# ==============================================================================
+node_modules/
+dist/
+dist-ssr/
+coverage/
+
+# Testing (Cypress / Vitest)
+/cypress/videos/
+/cypress/screenshots/
+__screenshots__/
+
+# ==============================================================================
+# Secrets & Environment Variables (IMPORTANT)
+# ==============================================================================
+*.env
+*.local
 *.properties
 *.properties.dev
 *.properties.prod
-*.env
