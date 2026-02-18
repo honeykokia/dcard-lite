@@ -34,14 +34,14 @@
     - `description`
         - 使用者輸入信箱
     - `validate`
-        - 依據 **Validation Rules** 進行驗證
+        - Ref: `docs/rp-001-register-login/api-contract.md` -> # Validation Rules
 - Password
     - `type`
         - input[password]
     - `description`
         - 使用者輸入密碼
     - `validate`
-        - 依據 **Validation Rules** 進行驗證
+        - Ref: `docs/rp-001-register-login/api-contract.md` -> # Validation Rules
 - Login
     - `type`
         - button
@@ -118,35 +118,35 @@
     - `description`
         - 使用者輸入名稱
     - `validate`
-        - 依據 **Validation Rules** 進行驗證
+        - Ref: `docs/rp-001-register-login/api-contract.md` -> # Validation Rules
 - Email
     - `type`
         - input
     - `description`
         - 使用者輸入信箱
     - `validate`
-        - 依據 **Validation Rules** 進行驗證
+        - Ref: `docs/rp-001-register-login/api-contract.md` -> # Validation Rules
 - Password
     - `type`
         - input[password]
     - `description`
         - 使用者輸入密碼
     - `validate`
-        - 依據 **Validation Rules** 進行驗證
+        - Ref: `docs/rp-001-register-login/api-contract.md` -> # Validation Rules
 - ConfirmPassword
     - `type`
         - input[password]
     - `description`
         - 使用者輸入確認密碼
     - `validate`
-        - 依據 **Validation Rules** 進行驗證
+        - Ref: `docs/rp-001-register-login/api-contract.md` -> # Validation Rules
 - Register
     - `type`
         - button
     - `description`
         - 進行註冊帳號
     - `validate`
-        - 用於提交註冊表單的按鈕
+        - 確認表單欄位都驗證成功
     - `function`
         - `POST /users/register`
 - Already have an account?
