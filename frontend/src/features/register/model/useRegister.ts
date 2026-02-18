@@ -1,7 +1,8 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { authApi } from '@/entities/auth/api/auth.api';
-import type { RegisterRequest } from '@/entities/auth/model/types';
+import { getEmailValidationErrors, getPasswordValidationErrors } from '@/shared/utils';
+import type { RegisterRequest } from '@/entities/auth/model';
 import type { ErrorResponse } from '@/entities/error/model/types';
 
 interface RegisterForm {
@@ -51,8 +52,8 @@ export function useRegister() {
            errors.value.confirmPassword.length === 0 &&
            form.value.name.trim() !== '' &&
            form.value.email.trim() !== '' &&
-           form.value.password.trim() !== '' &&
-           form.value.confirmPassword.trim() !== '';
+           form.value.password !== '' &&
+           form.value.confirmPassword !== '';
   });
 
   /**
@@ -89,50 +90,15 @@ export function useRegister() {
    * 驗證 Email
    */
   const validateEmail = () => {
-    errors.value.email = [];
-    const email = form.value.email.trim();
+    errors.value.email = getEmailValidationErrors(form.value.email);
 
-    if (!email) {
-      errors.value.email.push('Email must not be blank');
-      return;
-    }
-
-    if (email.length > 100) {
-      errors.value.email.push('Email maximum length 100 characters');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      errors.value.email.push('Email must be in a valid email format');
-      return;
-    }
   };
 
   /**
    * 驗證 Password
    */
   const validatePassword = () => {
-    errors.value.password = [];
-    const password = form.value.password;
-
-    if (!password || password.trim() === '') {
-      errors.value.password.push('Password must not be blank');
-      return;
-    }
-
-    if (password.length < 8 || password.length > 12) {
-      errors.value.password.push('Password length must be between 8 and 12 characters');
-      return;
-    }
-
-    const hasLetter = /[a-zA-Z]/.test(password);
-    const hasDigit = /\d/.test(password);
-
-    if (!hasLetter || !hasDigit) {
-      errors.value.password.push('Password must contain at least one letter and one digit');
-      return;
-    }
+    errors.value.password = getPasswordValidationErrors(form.value.password);
   };
 
   /**
@@ -142,7 +108,7 @@ export function useRegister() {
     errors.value.confirmPassword = [];
     const confirmPassword = form.value.confirmPassword;
 
-    if (!confirmPassword || confirmPassword.trim() === '') {
+    if (confirmPassword == null || confirmPassword === '') {
       errors.value.confirmPassword.push('ConfirmPassword must not be blank');
       return;
     }
@@ -168,7 +134,7 @@ export function useRegister() {
    * 處理 API 錯誤
    */
   const handleApiError = (error: any) => {
-    if (error.response?.data) {
+    if (error?.response?.data) {
       const errorData = error.response.data as ErrorResponse;
 
       // 根據 error code 映射錯誤訊息

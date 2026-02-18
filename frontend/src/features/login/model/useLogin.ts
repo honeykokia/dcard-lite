@@ -1,8 +1,11 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { authApi } from '@/entities/auth/api/auth.api';
-import type { LoginRequest } from '@/entities/auth/model/types';
+import { useAuthStore } from '@/entities/auth/model';
+import { getPasswordValidationErrors, getEmailValidationErrors } from '@/shared/utils';
+import type { LoginRequest } from '@/entities/auth/model';
 import type { ErrorResponse } from '@/entities/error/model/types';
+
 
 interface LoginForm {
   email: string;
@@ -16,6 +19,7 @@ interface FormErrors {
 
 export function useLogin() {
   const router = useRouter();
+  const authStore = useAuthStore();
 
   // 表單狀態
   const form = ref<LoginForm>({
@@ -39,58 +43,22 @@ export function useLogin() {
   const isValid = computed(() => {
     return errors.value.email.length === 0 &&
            errors.value.password.length === 0 &&
-           form.value.email.trim() !== '' &&
-           form.value.password.trim() !== '';
+           form.value.email !== '' &&
+           form.value.password !== '';
   });
 
   /**
    * 驗證 Email
    */
   const validateEmail = () => {
-    errors.value.email = [];
-    const email = form.value.email.trim();
-
-    if (!email) {
-      errors.value.email.push('Email must not be blank');
-      return;
-    }
-
-    if (email.length > 100) {
-      errors.value.email.push('Email maximum length 100 characters');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      errors.value.email.push('Email must be in a valid email format');
-      return;
-    }
+    errors.value.email = getEmailValidationErrors(form.value.email);
   };
 
   /**
    * 驗證 Password
    */
   const validatePassword = () => {
-    errors.value.password = [];
-    const password = form.value.password;
-
-    if (!password || password.trim() === '') {
-      errors.value.password.push('Password must not be blank');
-      return;
-    }
-
-    if (password.length < 8 || password.length > 12) {
-      errors.value.password.push('Password length must be between 8 and 12 characters');
-      return;
-    }
-
-    const hasLetter = /[a-zA-Z]/.test(password);
-    const hasDigit = /\d/.test(password);
-
-    if (!hasLetter || !hasDigit) {
-      errors.value.password.push('Password must contain at least one letter and one digit');
-      return;
-    }
+    errors.value.password = getPasswordValidationErrors(form.value.password);
   };
 
   /**
@@ -150,11 +118,8 @@ export function useLogin() {
 
       const response = await authApi.login(loginRequest);
 
-      // 儲存 token
-      localStorage.setItem('accessToken', response.accessToken);
-
-      // 可選：儲存使用者資訊
-      localStorage.setItem('displayName', response.displayName);
+      // 使用 authStore 儲存認證資訊
+      authStore.setAuth(response);
 
       // 跳轉到首頁
       router.push('/');
