@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router';
 import { authApi } from '@/entities/auth/api/auth.api';
 import { getEmailValidationErrors, getPasswordValidationErrors } from '@/shared/utils';
 import type { RegisterRequest } from '@/entities/auth/model';
-import type { ErrorResponse } from '@/entities/error/model/types';
+import type { ErrorResponse } from '@/entities/error/model/error.types.ts';
 
 interface RegisterForm {
   name: string;

@@ -4,7 +4,7 @@ import { authApi } from '@/entities/auth/api/auth.api';
 import { useAuthStore } from '@/entities/auth/model';
 import { getPasswordValidationErrors, getEmailValidationErrors } from '@/shared/utils';
 import type { LoginRequest } from '@/entities/auth/model';
-import type { ErrorResponse } from '@/entities/error/model/types';
+import type { ErrorResponse } from '@/entities/error/model/error.types.ts';
 
 
 interface LoginForm {

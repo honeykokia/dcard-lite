@@ -54,65 +54,68 @@
 ### 建議閱讀順序
 
 1. **系統總覽** - [`docs/fsd/dcard-lite-forum-fsd-v1.md`](docs/fsd/dcard-lite-forum-fsd-v1.md)
-   - 專案目標、功能列表、系統架構、非功能性需求
+2. **功能模組 (RP 規格書)** - 每個模組包含詳細設計、前後端規範與測試案例：
 
-2. **API 規格** - [`docs/api/api-spec.yaml`](docs/api/api-spec.yaml)
-   - OpenAPI 3.0 格式的完整 API 文件
+#### 🚀 已完成模組化重構 (Feature-based)
+- **RP-001: 註冊與登入** - [`docs/rp001-register-login/`](docs/rp001-register-login/)
+  > 💡 包含：[API 契約]、[後端邏輯]、[前端頁面]、[前端組件] 與 [測試規格]
 
-3. **功能模組 (RP 文件)** - 每個模組包含詳細的設計與測試案例
-   - RP-001: [註冊與登入](docs/rp/001-register-login.md)
-   - RP-002: [看板列表](docs/rp/002-listboards.md)
-   - RP-003: [發表文章](docs/rp/003-create-post.md)
-   - RP-004: [文章列表](docs/rp/004-list-posts.md)
-   - RP-005: [文章詳情](docs/rp/005-get-post.md)
-   - RP-006: [編輯/刪除文章](docs/rp/006-update_delete_post.md)
-   - RP-007: [文章留言](docs/rp/007-create-comment.md)
+#### 🚧 原始規格存檔 (Legacy - 逐步遷移中)
+- RP-002: [看板列表](docs/rp/002-listboards.md)
+- RP-003: [發表文章](docs/rp/003-create-post.md)
+- RP-004: [文章列表](docs/rp/004-list-posts.md)
+- RP-005: [文章詳情](docs/rp/005-get-post.md)
+- RP-006: [編輯/刪除文章](docs/rp/006-update_delete_post.md)
+- RP-007: [文章留言](docs/rp/007-create-comment.md)
 
 ---
 <a id="project-structure"></a>
 ## 📁 專案結構
 
 ```
-demo/
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/demo/
-│   │   │   ├── common/
-│   │   │   │   └── security/
-│   │   │   │       └── JwtService.java          # JWT 服務
-│   │   │   ├── user/
-│   │   │   │   ├── dto/
-│   │   │   │   │   └── RegisterUserRequest.java # 註冊 DTO
-│   │   │   │   └── ...
-│   │   │   ├── board/
-│   │   │   │   ├── dto/
-│   │   │   │   │   └── BoardItem.java           # 看板 DTO
-│   │   │   │   └── ...
-│   │   │   ├── post/
-│   │   │   │   ├── service/
-│   │   │   │   │   └── PostService.java         # 文章服務
-│   │   │   │   ├── enums/
-│   │   │   │   │   └── PostStatus.java          # 文章狀態枚舉
-│   │   │   │   └── ...
-│   │   │   └── comment/
-│   │   │       └── ...
-│   │   └── resources/
-│   │       ├── application.yml                   # 應用配置
-│   │       └── db/changelog/                     # Liquibase 變更集
-│   │           ├── db.changelog-master.yaml
-│   │           └── changes/
-│   │               ├── 001-init.yaml
-│   │               ├── 002-create-boards.yaml
-│   │               ├── 003-create-posts.yaml
-│   │               ├── 005-add-indexes-to-posts.yaml
-│   │               └── 006-create-comments.yaml
-│   └── test/                                     # 單元測試
-│       └── java/com/example/demo/
-└── docs/                                         # 文件目錄
-    ├── fsd/                                      # 功能規格文件
-    ├── api/                                      # API 規格
-    ├── rp/                                       # 模組設計文件
-    └── db/                                       # 資料庫文件
+dcard-lite/
+├── backend/
+│   ├── src/main/java/com/example/demo/
+│   │   ├── common/                # 共用邏輯 (e.g., JWT, Error Handling)
+│   │   ├── user/                  # 使用者模組
+│   │   ├── board/                 # 看板模組
+│   │   ├── post/                  # 文章模組
+│   │   └── comment/               # 留言模組
+│   └── src/main/resources/
+│       ├── application.yml        # 應用配置
+│       └── db/changelog/          # Liquibase 變更集
+│           ├── db.changelog-master.yaml
+│           └── changes/
+│               ├── 001-init.yaml
+│               ├── 002-create-boards.yaml
+│               ├── 003-create-posts.yaml
+│               ├── 005-add-indexes-to-posts.yaml
+│               └── 006-create-comments.yaml
+├── frontend/
+│   ├── src/
+│   │   ├── pages/                 # Vue 頁面
+│   │   ├── features/              # 功能模組 (e.g., Register, Login)
+│   │   ├── entities/              # 前端實體 (e.g., Auth, Error)
+│   │   ├── utils/                 # 共用工具 (e.g., Validation, API)
+│   │   ├── shared/                # 共用邏輯 (e.g., Validation, API)
+│   │   └── main.ts                # Vue 應用入口
+│   └── public/
+│       └── index.html             # 前端入口 HTML
+└── docs/                          # 文件目錄
+    ├── fsd/                       # 功能規格文件
+    ├── rp001-register-login/      # ✅ 已拆分之模組化文件
+    │   ├── api-contract.md
+    │   ├── backend.md
+    │   ├── frontend-pages.md
+    │   ├── frontend-components.md
+    │   └── test.md
+    └── rp/                        # 🚧 原始模組設計文件 (待遷移)
+        ├── 002-listboards.md
+        ├── 003-create-post.md
+        ├── 004-list-posts.md
+        ├── 005-get-post.md
+        ├── 006-update_delete_post.md
+        └── 007-create-comment.md
 ```
 
 ---
