@@ -16,7 +16,7 @@
 
 ## Wireframe
 ### UI Layout
-#### LoginPage
+#### LoginForm
 ```
 +-----------------------------+
 |           Logo              |
@@ -72,13 +72,13 @@
         - label
     - `description`
         - 提醒使用者沒有帳號可以註冊
-- Login
+- Register
     - `type`
         - link
     - `description`
         - 跳轉至註冊頁面
     - `function`
-        - Go `/users/register`
+        - Go `/register`
 
 ##### User Flow
 1. 使用者訪問 `/login` 頁面
@@ -87,9 +87,9 @@
 4. 系統驗證使用者的帳號和密碼
     - 如果驗證成功，重定向到首頁 `/`
     - 如果驗證失敗，顯示錯誤訊息並保持在登入頁面
-1. 如果使用者沒有帳號，點擊「Register」連結，重定向到註冊頁面 `/register`
+5. 如果使用者沒有帳號，點擊「Register」連結，重定向到註冊頁面 `/register`
 
-#### RegisterPage
+#### RegisterForm
 ```
 +---------------------------------------+
 |                                       |
@@ -176,7 +176,7 @@
     - `description`
         - 跳轉至登入頁面
     - `function`
-        - Go `/users/login`
+        - Go `/login`
 
 ##### User Flow
 1. 使用者訪問 `/register` 頁面
@@ -185,11 +185,29 @@
 4. 系統驗證使用者的名稱、信箱、密碼和確認密碼
     - 如果驗證成功，重定向到登入 `/login`
     - 如果驗證失敗，顯示錯誤訊息並保持在註冊頁面
-1. 如果使用者已經有帳號，點擊「Login」連結，重定向到登入頁面 `/login`
+5. 如果使用者已經有帳號，點擊「Login」連結，重定向到登入頁面 `/login`
 
 ### Router
 - `/login` - LoginPage
 - `/register` - RegisterPage
+### State Management (Pinia)
+#### `auth`
+- Location：`src/entities/auth/model/auth.store.ts`
+- State
+    - token (`string` | `null`)
+        - `localStorage` 取值
+    - user (`object`)
+        - `{userId: '', displayName: ''}`
+- Getter
+    - isLoggedIn (boolean)
+        - 判斷 token是否存在
+- Actions
+    - `setAuth(data)`
+        - 更新 `token` 與 `user` 狀態
+    - `clearAuth()`
+        - 重置 `token`為`null`
+        - 清空 `user` 物件
+        - 移除 `localStorage` 中的相關Key
 ### Form Validation Timing
 - **即時驗證**: onBlur 時驗證單一欄位
 - **提交驗證**: onClick 提交時驗證所有欄位
@@ -207,13 +225,31 @@
 後端 `code` → 前端顯示文字對照表
 ### API Base URL
 ```env.development
-VITE_API_BASE_URL=http://ocalhost:8080
+VITE_API_BASE_URL=http://localhost:8080
 ```
 ### Token Management
 - **儲存位置**: `localStorage`
 - **Key 名稱**: `accessToken`
 - **自動設定**: 登入成功後，所有後續 API 請求的 Header 自動帶上 `Authorization: Bearer {token}`
 - **登出處理**: 清除 `localStorage` 中的 token
+
+### Logout Handling
+- **觸發機制**：
+    - **主動觸發**：使用者點擊 UI 介面（如 Navbar）中的「登出」按鈕。
+    - **被動觸發**：當 API 回傳 `401 Unauthorized` 錯誤時，由 Axios 攔截器自動呼叫。
+
+- **執行邏輯 (useAuth Composable)**：
+    1. **狀態清理**：執行 `authStore.clearAuth()`。
+        - 移除 `localStorage` 內所有認證相關 Key (`accessToken`, `userId`, `displayName`)。
+        - 重置 Pinia Store 內的響應式變數。
+
+    2. **路由重導向**：
+        - 執行 `router.replace('/login')` 跳轉回登入頁面。
+        - **注意**：使用 `replace` 而非 `push`，以防止使用者透過瀏覽器「回退」按鈕返回已登出的頁面。
+
+- **預期效果**：
+    - 全域 UI 立刻響應（導覽列切換為「登入/註冊」按鈕）。
+    - 隨後發送的 API 請求將不再攜帶 `Authorization` Header。
 
 ## DB Changes (MySQL + Liquibase)
 - Table: `users`
