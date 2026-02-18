@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { useAuthStore, useAuth } from '@/entities/auth/model';
+import router from '@/router';
 
 // 創建 Axios 實例
 const apiClient = axios.create({
@@ -10,7 +12,8 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     // 在這裡添加通用的請求頭，例如 Authorization
-    const accessToken = localStorage.getItem('accessToken');
+    const authStore = useAuthStore();
+    const accessToken = authStore.token;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -26,11 +29,18 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
-      const { status, data } = error.response || {};
+      const { status } = error.response || {};
+
+    if (!error.response) {
+        console.error('網路連線異常，請檢查您的網路設定');
+        return Promise.reject({ message: '網路連線異常，請稍後再試' });
+    }
 
       // 1. 處理「系統級」錯誤：全域處理
       if (status === 401) {
         // 觸發全域登出邏輯
+        useAuth().logout();
+        router.replace('/login');
         return Promise.reject(error);
       }
 
