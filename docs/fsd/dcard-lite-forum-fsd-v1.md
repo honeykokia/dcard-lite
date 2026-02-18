@@ -101,24 +101,51 @@ Frontend (Vue 3)
 
 - **專案目錄**：
     
-    ```
-    dcard-lite/
-    ├── backend/
-    │   ├── src/main/java/com.leo.dcard
-    │   │   ├── controller/
-    │   │   ├── service/
-    │   │   ├── repository/
-    │   │   ├── domain/          # Entity + Domain Model
-    │   │   ├── dto/             # Request/Response DTO
-    │   │   ├── security/        # JWT, auth filters
-    │   │   └── common/          # error, utils, constants
-    │   └── src/main/resources/
-    │       ├── application.yml
-    │       └── migration/       # Liquibase
-    ├── frontend/
-    │   └── src/                 # Vue pages/components
-    └── docker/
-    ```
+```
+dcard-lite/
+├── backend/
+│   ├── src/main/java/com/example/demo/
+│   │   ├── common/                # 共用邏輯 (e.g., JWT, Error Handling)
+│   │   ├── user/                  # 使用者模組
+│   │   ├── board/                 # 看板模組
+│   │   ├── post/                  # 文章模組
+│   │   └── comment/               # 留言模組
+│   └── src/main/resources/
+│       ├── application.yml        # 應用配置
+│       └── db/changelog/          # Liquibase 變更集
+│           ├── db.changelog-master.yaml
+│           └── changes/
+│               ├── 001-init.yaml
+│               ├── 002-create-boards.yaml
+│               ├── 003-create-posts.yaml
+│               ├── 005-add-indexes-to-posts.yaml
+│               └── 006-create-comments.yaml
+├── frontend/
+│   ├── src/
+│   │   ├── pages/                 # Vue 頁面
+│   │   ├── features/              # 功能模組 (e.g., Register, Login)
+│   │   ├── entities/              # 前端實體 (e.g., Auth, Error)
+│   │   ├── utils/                 # 共用工具 (e.g., Validation, API)
+│   │   ├── shared/                # 共用邏輯 (e.g., Validation, API)
+│   │   └── main.ts                # Vue 應用入口
+│   └── public/
+│       └── index.html             # 前端入口 HTML
+└── docs/                          # 文件目錄
+├── fsd/                       # 功能規格文件
+├── rp001-register-login/      # ✅ 已拆分之模組化文件
+│   ├── api-contract.md
+│   ├── backend.md
+│   ├── frontend-pages.md
+│   ├── frontend-components.md
+│   └── test.md
+└── rp/                        # 🚧 原始模組設計文件 (待遷移)
+├── 002-listboards.md
+├── 003-create-post.md
+├── 004-list-posts.md
+├── 005-get-post.md
+├── 006-update_delete_post.md
+└── 007-create-comment.md
+```
     
 
 ### 3.3 關鍵流程
