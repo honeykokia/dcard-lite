@@ -54,7 +54,7 @@ const {
             id="email"
             v-model="form.email"
             type="email"
-            class="w-full px-4 py-3 text-base text-gray-800 bg-white border rounded-lg transition-all duration-200 focus:outline-none focus:ring-3"
+            class="w-full px-4 py-3 text-base text-gray-800 bg-white border rounded-lg transition-all duration-200 focus:outline-none focus:ring"
             :class="
               errors.email.length > 0
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-100'
@@ -79,7 +79,7 @@ const {
             id="password"
             v-model="form.password"
             type="password"
-            class="w-full px-4 py-3 text-base text-gray-800 bg-white border rounded-lg transition-all duration-200 focus:outline-none focus:ring-3"
+            class="w-full px-4 py-3 text-base text-gray-800 bg-white border rounded-lg transition-all duration-200 focus:outline-none focus:ring"
             :class="
               errors.password.length > 0
                 ? 'border-red-500 focus:border-red-500 focus:ring-red-100'
@@ -98,7 +98,7 @@ const {
         <!-- Submit Button -->
         <button
           type="submit"
-          class="w-full px-4 py-3.5 text-base font-semibold text-white bg-[#3397cf] rounded-lg transition-all duration-200 mt-2 hover:bg-opacity-90 active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-3 focus:ring-[#3397cf]/30"
+          class="w-full px-4 py-3.5 text-base font-semibold text-white bg-[#3397cf] rounded-lg transition-all duration-200 mt-2 hover:bg-opacity-90 active:scale-95 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring focus:ring-[#3397cf]/30"
           :disabled="isLoading || !isValid"
         >
           <span v-if="!isLoading">Login</span>
