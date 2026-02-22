@@ -1,5 +1,5 @@
-import apiClient from '@/core/api';
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../model';
+import apiClient from '@/app/api';
+import type { LoginRequest, LoginResponse, RegisterUserRequest, RegisterUserResponse } from '../model';
 
 export const authApi = {
     /**
@@ -7,8 +7,8 @@ export const authApi = {
      * @param request 註冊請求資料
      * @returns 註冊回應資料
      */
-    register: async (request: RegisterRequest): Promise<RegisterResponse> => {
-        const response = await apiClient.post<RegisterResponse>('/users/register', request);
+    register: async (request: RegisterUserRequest): Promise<RegisterUserResponse> => {
+        const response = await apiClient.post<RegisterUserResponse>('/users/register', request);
         return response.data;
     },
 

@@ -2,20 +2,9 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { authApi } from '@/entities/auth/api/auth.api';
 import { useAuthStore } from '@/entities/auth/model';
-import { getPasswordValidationErrors, getEmailValidationErrors } from '@/shared/utils';
-import type { LoginRequest } from '@/entities/auth/model';
+import { getPasswordValidationErrors, getEmailValidationErrors } from '@/shared/utils';import type { LoginRequest, LoginForm, LoginFormErrors } from '@/entities/auth/model';
 import type { ErrorResponse } from '@/entities/error/model/error.types.ts';
 
-
-interface LoginForm {
-  email: string;
-  password: string;
-}
-
-interface FormErrors {
-  email: string[];
-  password: string[];
-}
 
 export function useLogin() {
   const router = useRouter();
@@ -28,7 +17,7 @@ export function useLogin() {
   });
 
   // 錯誤狀態
-  const errors = ref<FormErrors>({
+  const errors = ref<LoginFormErrors>({
     email: [],
     password: []
   });
@@ -37,7 +26,7 @@ export function useLogin() {
   const isLoading = ref(false);
 
   // API 錯誤訊息
-  const apiError = ref('');
+  const error = ref('');
 
   // 表單是否有效
   const isValid = computed(() => {
@@ -73,9 +62,9 @@ export function useLogin() {
   /**
    * 處理 API 錯誤
    */
-  const handleApiError = (error: any) => {
-    if (error.response?.data) {
-      const errorData = error.response.data as ErrorResponse;
+  const handleApiError = (err: any) => {
+    if (err.response?.data) {
+      const errorData = err.response.data as ErrorResponse;
 
       // 根據 error code 映射錯誤訊息
       switch (errorData.code) {
@@ -86,13 +75,13 @@ export function useLogin() {
           errors.value.password = [errorData.message || 'Invalid password'];
           break;
         case 'AUTHENTICATION_FAILED':
-          apiError.value = 'Email or password is incorrect';
+          error.value = 'Email or password is incorrect';
           break;
         default:
-          apiError.value = errorData.message || 'Login failed. Please try again.';
+          error.value = errorData.message || 'Login failed. Please try again.';
       }
     } else {
-      apiError.value = 'Network error. Please try again.';
+      error.value = 'Network error. Please try again.';
     }
   };
 
@@ -101,7 +90,7 @@ export function useLogin() {
    */
   const handleLogin = async () => {
     // 清除之前的 API 錯誤
-    apiError.value = '';
+    error.value = '';
 
     // 驗證所有欄位
     if (!validateAll()) {
@@ -123,8 +112,8 @@ export function useLogin() {
 
       // 跳轉到首頁
       router.push('/');
-    } catch (error) {
-      handleApiError(error);
+    } catch (err) {
+      handleApiError(err);
     } finally {
       isLoading.value = false;
     }
@@ -142,7 +131,7 @@ export function useLogin() {
       email: [],
       password: []
     };
-    apiError.value = '';
+    error.value = '';
   };
 
   return {
@@ -150,7 +139,7 @@ export function useLogin() {
     form,
     errors,
     isLoading,
-    apiError,
+    error,
     isValid,
 
     // 方法
