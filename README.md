@@ -58,7 +58,7 @@
 
 #### 🚀 已完成模組化重構 (Feature-based)
 - **RP-001: 註冊與登入** - [`docs/rp001-register-login/`](docs/rp001-register-login/)
-  > 💡 包含：[API 契約]、[後端邏輯]、[前端頁面]、[前端組件] 與 [測試規格]
+  > 💡 包含：[API 契約]、[後端邏輯]、[前端組件頁面] 與 [測試規格]
 
 #### 🚧 原始規格存檔 (Legacy - 逐步遷移中)
 - RP-002: [看板列表](docs/rp/002-listboards.md)
