@@ -5,7 +5,7 @@ const {
   form,
   errors,
   isLoading,
-  apiError,
+  error,
   isValid,
   validateEmail,
   validatePassword,
@@ -30,7 +30,7 @@ const {
 
       <!-- API Error Alert -->
       <div
-        v-if="apiError"
+        v-if="error"
         class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-600 rounded-lg p-4 mb-6 text-sm"
       >
         <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -40,7 +40,7 @@ const {
             clip-rule="evenodd"
           />
         </svg>
-        <span>{{ apiError }}</span>
+        <span>{{ error }}</span>
       </div>
 
       <!-- Login Form -->

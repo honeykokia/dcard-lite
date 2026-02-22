@@ -2,22 +2,8 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { authApi } from '@/entities/auth/api/auth.api';
 import { getEmailValidationErrors, getPasswordValidationErrors } from '@/shared/utils';
-import type { RegisterRequest } from '@/entities/auth/model';
+import type { RegisterUserRequest, RegisterForm, RegisterFormErrors } from '@/entities/auth/model';
 import type { ErrorResponse } from '@/entities/error/model/error.types.ts';
-
-interface RegisterForm {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
-
-interface FormErrors {
-  name: string[];
-  email: string[];
-  password: string[];
-  confirmPassword: string[];
-}
 
 export function useRegister() {
   const router = useRouter();
@@ -31,7 +17,7 @@ export function useRegister() {
   });
 
   // 錯誤狀態
-  const errors = ref<FormErrors>({
+  const errors = ref<RegisterFormErrors>({
     name: [],
     email: [],
     password: [],
@@ -42,7 +28,7 @@ export function useRegister() {
   const isLoading = ref(false);
 
   // API 錯誤訊息
-  const apiError = ref('');
+  const error = ref('');
 
   // 表單是否有效
   const isValid = computed(() => {
@@ -133,9 +119,9 @@ export function useRegister() {
   /**
    * 處理 API 錯誤
    */
-  const handleApiError = (error: any) => {
-    if (error?.response?.data) {
-      const errorData = error.response.data as ErrorResponse;
+  const handleApiError = (err: any) => {
+    if (err?.response?.data) {
+      const errorData = err.response.data as ErrorResponse;
 
       // 根據 error code 映射錯誤訊息
       switch (errorData.code) {
@@ -155,10 +141,10 @@ export function useRegister() {
           errors.value.confirmPassword = [errorData.message || 'Invalid confirm password'];
           break;
         default:
-          apiError.value = errorData.message || 'Registration failed. Please try again.';
+          error.value = errorData.message || 'Registration failed. Please try again.';
       }
     } else {
-      apiError.value = 'Network error. Please try again.';
+      error.value = 'Network error. Please try again.';
     }
   };
 
@@ -167,7 +153,7 @@ export function useRegister() {
    */
   const handleRegister = async () => {
     // 清除之前的 API 錯誤
-    apiError.value = '';
+    error.value = '';
 
     // 驗證所有欄位
     if (!validateAll()) {
@@ -177,7 +163,7 @@ export function useRegister() {
     try {
       isLoading.value = true;
 
-      const registerRequest: RegisterRequest = {
+      const registerRequest: RegisterUserRequest = {
         name: form.value.name.trim(),
         email: form.value.email.trim().toLowerCase(),
         password: form.value.password,
@@ -189,8 +175,8 @@ export function useRegister() {
       // 註冊成功，跳轉到登入頁面
       router.push('/login');
 
-    } catch (error) {
-      handleApiError(error);
+    } catch (err) {
+      handleApiError(err);
     } finally {
       isLoading.value = false;
     }
@@ -212,7 +198,7 @@ export function useRegister() {
       password: [],
       confirmPassword: []
     };
-    apiError.value = '';
+    error.value = '';
   };
 
   return {
@@ -220,7 +206,7 @@ export function useRegister() {
     form,
     errors,
     isLoading,
-    apiError,
+    error,
     isValid,
 
     // 方法

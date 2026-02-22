@@ -11,12 +11,37 @@
     - constraints:
         - PK: `pk_users` (user_id)
         - UK: `uq_users_email` (email)
+## DTOs
+- **LoginRequest**
+    - email (`String`)
+    - password (`String`)
+- **LoginResponse**
+    - userId (`long`)
+    - displayName (`String`)
+    - role (`UserRole`)
+    - accessToken (`String`)
+- **RegisterUserRequest**
+    - name (`String`)
+    - email (`String`)
+    - password (`String`)
+    - confirmPassword (`String`)
+- **RegisterUserResponse**
+    - userId (`long`)
+    - displayName (`String`)
+    - email (`String`)
+    - role (`UserRole`)
+    - createdAt (`Instant`)
+
+## Enums
+- **UserRole**
+    - User
+    - ADMIN
 ## Service Logic
 ### `UserService`
 #### Use Case: Register
 - **Method Signature**:
 ```java  
-RegisterResponse register(RegisterRequest request);  
+RegisterUserResponse register(RegisterUserRequest request);  
 ```  
 - **Transaction**:
     - `@Transactional` (確保資料一致性)
@@ -30,13 +55,13 @@ RegisterResponse register(RegisterRequest request);
     - `displayName` (String)
     - `email` (String)
     - `role` (String)
-    - `createdAt` (LocalDateTime)
+    - `createdAt` (Instant)
 - **Logic Flow**:
     1. 驗證輸入資料是否符合規範（如名稱、Email、密碼格式）。
     2. 檢查 Email 是否已存在於資料庫中。
     3. 使用 BCrypt 將密碼進行雜湊處理。
     4. 將新使用者資料儲存至資料庫。
-    5. 回傳包含使用者資訊的 `RegisterResponse`。
+    5. 回傳包含使用者資訊的 `RegisterUserResponse`。
 #### Use Case: Login
 - **Method Signature**:
 ```java  
