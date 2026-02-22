@@ -77,7 +77,7 @@
         - `EMAIL_ALREADY_EXISTS`
             - Email is existed
 
-## API Contract
+## API Endpoints
 ### `POST /users/register`
 #### Request JSON
 ```json  
