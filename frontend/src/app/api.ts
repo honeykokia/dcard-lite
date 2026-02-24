@@ -40,7 +40,6 @@ apiClient.interceptors.response.use(
       if (status === 401) {
         // 觸發全域登出邏輯
         useAuth().logout();
-        router.replace('/login');
         return Promise.reject(error);
       }
 

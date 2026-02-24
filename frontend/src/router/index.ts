@@ -8,6 +8,11 @@ const router = createRouter({
       redirect: '/home'
     },
     {
+      path: '/home',
+      name: 'Home',
+      component: () => import('@/pages/home/HomePage.vue'),
+    },
+    {
       path: '/login',
       name: 'Login',
       component: () => import('@/pages/auth/LoginPage.vue'),

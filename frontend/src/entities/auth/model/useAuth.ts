@@ -1,4 +1,4 @@
-import { useRouter } from 'vue-router';
+import router from '@/router';
 import { useAuthStore } from './auth.store';
 
 /**
@@ -6,7 +6,6 @@ import { useAuthStore } from './auth.store';
  * 提供認證相關的共用邏輯，包含登出功能
  */
 export const useAuth = () => {
-  const router = useRouter();
   const authStore = useAuthStore();
 
   /**
